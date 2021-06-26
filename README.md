@@ -24,7 +24,7 @@
  * 开源免费，功能丰富，社区活跃
  * 多种数据格式的支持：key-value数据格式，二维表，TypendArray
  * 流数据的支持，移动端优化，跨平台使用，绚丽的特效，三维可视化
-### 5分钟上手ECharts
+###  5分钟上手ECharts
   * 引入echarts.js文件
   * 准备一个呈现图表的盒子
   * 初始化echarts实例对象
@@ -36,5 +36,39 @@
 注：toolboxtoolbox: ECharts提供的工具栏
 * 内置有导出图片，数据视图，动态类型切换，数据区域缩放，重置五个工具
 * 显示工具栏按钮feature：saveAsIamge,dataView,restore,dataZoom,magicType
+### 矢量地图的实现步骤
+* ECharts最基本的代码结构: 引入js文件,DOM容器,初始化对象，设置option
+* 准备中国的矢量地图json文件,放到json/map/的目录下china.json
+* 使用Ajax获取china.json
+   $.get('json/map/china.json' , function (chinajson) 0)
+* 在回调函数中往echarts全局对象注册地图的json数据：echarts.registerMap('chinaMap', chinajson);
+* 在geo下设置：type:'map'map: 'chinaMap'
+     ```
+     <script>
+         var mCharts=echarts.init(document.querySelector("div"))
+         $.get('json/china.json',function(ret){
+             echarts.registerMap('chinaMap',ret)
+         var option={
+             geo:{
+                 type:'map',
+                 map:'chinaMap',
+                 roam:true
+             }
+             }
+         mCharts.setOption(option)
+         })
 
-
+     </script>
+     ```
+* 常见效果:地图和散点图结合
+ 1. 给series下增加新的对象
+ 2. 准备好散点数据,设置给新对象的data
+ 3. 配置新对象的type-type:effectScatter
+ 4. 让散点图使用地图坐标系统coordinateSystem: 'geo'，
+ 5. 让涟漪的效果更加明显
+    ```
+     rippleEffect: {
+     scale: 10
+     )
+   ```
+  
