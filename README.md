@@ -85,3 +85,35 @@
 * 折线图:折线图常用来分析数据随时间的变化趋势
 * 散点图:散点图可以帮助我们推断出不同维度数据之间的相关性
 * 饼图:饼图可以很好地帮助用户快速了解不同分类的数据的占比情况
+
+## 前端工程创建
+具体的配置项如下：
+ * 手动选择特性
+ * 集成 Router , Vuex , CSS Pre-processors
+ * 选择 Less 作为 CSS 的预处理器(no)
+ * 选择 Less 作为 CSS 的预处理器
+ * 选择 ESLint 的配置
+ * 什么时候进行 Lint 提示
+ * 如何存放 Babel , ESLint 等配置文件:In dedicated config files
+ * 是否保存以上配置以便下次创建项目时使用
+### 在项目根目录下创建 vue.config.js 文件
+  在文件中增加代码:
+ ```
+   // 使用vue-cli创建出来的vue工程, Webpack的配置是被隐藏起来了的
+   // 如果想覆盖Webpack中的默认配置,需要在项目的根路径下增加vue.config.js文件
+  module.exports = {
+    devServer: {
+    port: 8999, // 端口号的配置
+    open: true // 自动打开浏览器
+    }
+  }
+ ```
+### 引入 echarts 包
+ * 将资料文件夹中的 static 目录复制到 public 目录之下
+ * 在 public/index.html 文件中引入 echarts.min.js 文件
+ * 在 src/main.js 文件中挂载，由于在 index.html 中已经通过script标签引入了 echarts.js 文件夹, 故在 window 全局对象中是存在 echarts 全局对象, 将其挂载到 Vue 的原型对象上
+  ```
+   // 将全局echarts对象挂载到Vue的原型对象上
+   Vue.prototype.$echarts = window.echarts
+  ```
+
