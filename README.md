@@ -116,4 +116,117 @@
    // 将全局echarts对象挂载到Vue的原型对象上
    Vue.prototype.$echarts = window.echarts
   ```
-
+## 商家销量排行
+效果图
+### 组件结构设计
+在 src/components/ 目录下建立 Seller.vue，这个组件是真实展示图表的组件
+  * 给外层div增加类样式 com-container
+  * 建立一个显示图表的div元素
+  * 给新增的这个div增加类样式 com-chart
+在 src/views/ 目录下建立 SellerPage.vue ,这个组件是对应于路由 /seller 而展示的
+  * 给外层div元素增加样式 com-page
+  * 在 SellerPage 中引入 Seller 组件,并且注册和使用
+  * 增加路由规则, 在 src/router/index.js 文件中修改
+### 图表Seller.vue基本功能的实现
+  * 在mounted生命周期中初始化 echartsInstance 对象
+  * 在mounted中获取服务器的数据
+  * 将获取到的数据设置到图表上
+ ```
+   <script>
+   export default {
+    data () {
+      return {
+       chartInstance: null, // echarts实例对象
+       allData: [] // 服务器获取的所有数据
+      }
+   },
+   mounted () {
+     // 由于初始化echarts实例对象需要使用到dom元素,因此必须要放到mounted中, 而不是created
+     this.initChart()
+     this.getData()
+   },
+   methods: {
+    initChart () {
+    this.chartInstance = this.$echarts.init(this.$refs.seller_ref) // 初始化echarts实例对象
+   },
+   async getData () {
+     const { data: res } = await this.$http.get('seller') // 获取数据
+     this.allData = res
+   // 对allData进行从大到小的排序
+    this.allData.sort((a, b) => {
+      return a.value - b.value
+    })
+     this.updateChart()
+   },
+   updateChart () {
+     // 处理数据并且更新界面图表
+    const sellerNames = this.allData.map((item) => {
+       return item.name
+   })
+   const sellerValues = this.allData.map((item) => {
+      return item.value
+   })
+   const option = {
+    xAxis: {
+      type: 'value'
+    },
+    yAxis: {
+      type: 'category',
+      data: sellerNames
+    },
+    series: [
+   {
+      type: 'bar',
+      data: sellerValues
+     }
+    ]
+   }
+     this.chartInstance.setOption(option)
+       }
+     }
+   }
+   </script>
+ ```
+ * 拆分配置项option
+    * 初始化配置项(和数据无关）
+    * 拥有数据之后的配置项
+ * 分页动画的实现
+   * 数据的处理, 每5个元素显示一页
+   * 数据的处理
+   ```
+       this.totalPage = Math.ceil(this.allData.length / 5)
+       const start = (this.curretnPage - 1) * 5
+       const end = this.curretnPage * 5
+       const showData = this.allData.slice(start, end)
+   ```
+   * 动画的启动和停止：通过定时器标识，开启定时器刷新效果
+   * 鼠标事件的处理 
+     ```
+      this.chartInstance.on('mouseover', () => {
+         this.timerId && clearInterval(this.timerId)
+       })
+      ```
+ ### 分辨率适配
+* 对窗口大小变化的事件进行监听
+```
+ mounted () {
+    this.initChart()
+    this.getData()
+    window.addEventListener('resize', this.screenAdapter)
+}
+```
+* 组件销毁时取消监听
+```
+ destroyed () {
+   clearInterval(this.timerId)
+   // 在组件销毁的时候, 需要将监听器取消掉
+   window.removeEventListener('resize', this.screenAdapter)
+ },
+```
+* 获取图表容器的宽度计算字体大小
+```
+  // 当浏览器的大小发生变化的时候, 会调用的方法, 来完成屏幕的适配
+  screenAdapter () {
+  // console.log(this.$refs.seller_ref.offsetWidth)
+  const titleFontSize = this.$refs.seller_ref.offsetWidth / 100 * 3.6
+```
