@@ -230,3 +230,4 @@
   // console.log(this.$refs.seller_ref.offsetWidth)
   const titleFontSize = this.$refs.seller_ref.offsetWidth / 100 * 3.6
 ```
+ ## 销量趋势分析
