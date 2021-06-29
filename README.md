@@ -355,3 +355,97 @@
        this.showChoice = false
       }
    ```
+## 商家地图分布
+效果图![销量趋势](https://github.com/lemon-0615/Echarts-vue/blob/main/%E6%95%88%E6%9E%9C%E5%9B%BE/%E5%95%86%E5%AE%B6%E5%88%86%E5%B8%83.png)
+### 显示地图
+* 获取中国地图矢量数据
+* 注册地图数据到 全局echarts对象 中
+* 配置 geo
+```
+ <script>
+  // 获取的是Vue环境之下的数据, 而不是我们后台的数据
+  import axios from 'axios'
+  export default {
+   ......
+   methods: {
+     async initChart () {
+        this.chartInstance = this.$echarts.init(this.$refs.map_ref)
+        const { data: mapData } = await axios.get('http://127.0.0.1:8999/static/map/china.json')
+        this.$echarts.registerMap('china', mapData)
+        const initOption = {
+        geo: {
+            type: 'map',
+            map: 'china'
+            }
+          }
+          this.chartInstance.setOption(initOption)
+        },
+ ```
+### 显示散点图
+ * 获取散点数据
+ ```
+   async getScatterData () {
+     // 获取服务器的数据, 对this.allData进行赋值之后, 调用updateChart方法更新图表
+     const { data: ret} = await this.$http.get('map')
+     this.allData = ret
+     this.updateChart()
+  }
+ ```
+* 处理数据并且更新图表
+```
+ updateChart () {
+    // 处理图表需要的数据
+     // 图例数据
+   const legendData = this.allData.map(item => {
+       return item.name
+})
+    // 散点数据
+  const seriesArr = this.allData.map(item => {
+     return {
+         type: 'effectScatter',
+         coordinateSystem: 'geo',
+         name: item.name,
+         data: item.children
+       }
+     })
+ const dataOption = {
+    legend: {
+       data: legendData
+     },
+       series: seriesArr
+    }
+    this.chartInstance.setOption(dataOption)
+ },
+ ```
+ ### 地图点击事件
+ * 响应图表的点击事件, 并获取点击项相关的数据
+ * 将资料中的 map_utils.js 复制到 src/utils/ 目录之下
+ * 得到地图所点击项的拼音和地图矢量数据的路径
+  ```
+   <script>
+  // 获取的是Vue环境之下的数据, 而不是我们后台的数据
+  import axios from 'axios'
+  import { getProvinceMapInfo } from '@/utils/map_utils'
+  export default {
+   ......
+   methods: {
+     async initChart () {
+     ......
+     this.chartInstance.setOption(initOption)
+     this.chartInstance.on('click', async arg => {
+       // arg.name 就是所点击的省份名称, 是中文
+      const provinceInfo = getProvinceMapInfo(arg.name)
+      const { data: ret } = await axios.get('http://127.0.0.1:8999' +provinceInfo.path)
+      this.$echarts.registerMap(provinceInfo.key, ret)
+      this.chartInstance.setOption({
+       geo: {
+         map: provinceInfo.key
+       }
+     })
+    })
+    this.getScatterData()
+     }
+   }
+   }
+   </script>
+   ```
