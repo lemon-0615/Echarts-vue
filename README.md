@@ -232,3 +232,124 @@
 ```
  ## 销量趋势分析
 效果图![销量趋势](https://github.com/lemon-0615/Echarts-vue/blob/main/%E6%95%88%E6%9E%9C%E5%9B%BE/%E9%94%80%E9%87%8F%E8%B6%8B%E5%8A%BF%E5%9B%BE.png)
+### 图表基本功能的实现
+ * 数据的获取:通过函数getData发送ajax请求异步获取数据
+  ```
+    async getData () {
+      // 获取服务器的数据, 对this.allData进行赋值之后, 调用updateChart方法更新图表
+      const { data: ret } = await this.$http.get('trend')
+      this.allData = ret
+      this.updateChart()
+   }
+
+  ```
+* 数据的处理
+    ```
+    updateChart () {
+      // x轴的数据
+      const timeArrs = this.allData.common.month
+      // y轴的数据, 暂时先取出map这个节点的数据
+      // map代表地区销量趋势
+      // seller代表商家销量趋势
+      // commodity代表商品销量趋势
+      const valueArrs = this.allData.map.data
+      // 图表数据, 一个图表中显示5条折线图
+      const seriesArr = valueArrs.map((item, index) => {
+         return {
+            type: 'line', // 折线图
+            name: item.name,
+            data: item.data,
+         }
+      })
+      const dataOption = {
+        xAxis: {
+          data: timeArrs
+        },
+      legend: {
+         data: legendArr
+        },
+      series: seriesArr
+         }
+        this.chartInstance.setOption(dataOption)
+      }
+    ```
+* 初始化配置
+   ```
+    const initOption = {
+     xAxis: {
+       type: 'category',
+       boundaryGap: false
+     },
+    yAxis: {
+       type: 'value'
+       }
+     }
+   ```
+* 堆叠图效果-要实现堆叠图的效果, series下的每个对象都需要配置上相同的stack属性
+### UI 效果的调整
+* 主题的使用
+* 区域面积的设置-区域面积只需要给series的每一个对象增加一个 areaStyle 即可
+* 颜色渐变的设置-颜色渐变可以通过 LinearGradient 进行设置, 颜色渐变的方向从上往下
+### 根据标题切换图表
+* 布局的实现-增加类样式为 title 的容器
+* 数据动态渲染v-for遍历
+ ```
+ <!-- 销量趋势图表 -->
+<template>
+ <div class='com-container'>
+  <div class="title">
+   <span>{{ title }}</span>
+   <span class="iconfont title-icon">&#xe6eb;</span>
+   <div class="select-con">
+      <div class="select-item" v-for="item in selectTypes" :key="item.key">
+        {{ item.text }}
+      </div>
+   </div>
+  </div>
+<div class='com-chart' ref='trend_ref'></div>
+</div>
+</template>
+ ```
+* 使用计算属性 title 控制标题的内容和标题的可选择项（过度掉当前选中的类别）
+    ```
+       <script>
+       export default {
+         data () {
+           return {
+              chartInstance: null,
+              allData: null,
+              dataType: 'map' // 这项数据代表目前选择的数据类型, 可选值有map seller
+         commodity
+       }
+      },
+      computed: {
+         selectTypes () {
+            if (!this.allData || ! this.allData.type) {
+              return []
+        } else {
+            return this.allData.type.filter(item => {
+              return item.key !== this.dataType
+           })
+          }
+        },
+      title () {
+        if (!this.allData) {
+          return ''
+      } else {
+        return this.allData[this.dataType].title
+         }
+        }
+       },
+     ```
+* 点击三角控制显示隐藏-增加一项变量控制可选容器的显示与隐藏，showChoice: false来控制可选面板的显示或者隐藏
+* 使用指令 v-if 和点击事件的监听
+<span class="iconfont title-icon" @click="showChoice =!showChoice">&#xe6eb;</span>
+<div class="select-con" v-if="showChoice">
+* 点击可选条目的控制
+  ```
+   handleSelect (key) {
+      this.dataType = key
+      this.updateChart()
+      this.showChoice = false
+     }
+  ```
