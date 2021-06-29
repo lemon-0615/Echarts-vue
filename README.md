@@ -343,13 +343,15 @@
      ```
 * 点击三角控制显示隐藏-增加一项变量控制可选容器的显示与隐藏，showChoice: false来控制可选面板的显示或者隐藏
 * 使用指令 v-if 和点击事件的监听
-<span class="iconfont title-icon" @click="showChoice =!showChoice">&#xe6eb;</span>
-<div class="select-con" v-if="showChoice">
+    ```
+     <span class="iconfont title-icon" @click="showChoice =!showChoice">&#xe6eb;</span>
+     <div class="select-con" v-if="showChoice">
+   ```
 * 点击可选条目的控制
-  ```
-   handleSelect (key) {
-      this.dataType = key
-      this.updateChart()
-      this.showChoice = false
-     }
-  ```
+   ```
+     handleSelect (key) {
+       this.dataType = key
+       this.updateChart()
+       this.showChoice = false
+      }
+   ```
