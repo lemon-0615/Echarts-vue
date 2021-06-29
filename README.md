@@ -117,7 +117,7 @@
    Vue.prototype.$echarts = window.echarts
   ```
 ## 商家销量排行
-效果图
+效果图![商家销售统计](https://github.com/lemon-0615/Echarts-vue/blob/main/%E6%95%88%E6%9E%9C%E5%9B%BE/%E5%95%86%E5%AE%B6%E9%94%80%E9%87%8F%E7%BB%9F%E8%AE%A1.png)
 ### 组件结构设计
 在 src/components/ 目录下建立 Seller.vue，这个组件是真实展示图表的组件
   * 给外层div增加类样式 com-container
@@ -231,3 +231,4 @@
   const titleFontSize = this.$refs.seller_ref.offsetWidth / 100 * 3.6
 ```
  ## 销量趋势分析
+效果图![销量趋势](https://github.com/lemon-0615/Echarts-vue/blob/main/%E6%95%88%E6%9E%9C%E5%9B%BE/%E9%94%80%E9%87%8F%E8%B6%8B%E5%8A%BF%E5%9B%BE.png)
