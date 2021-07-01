@@ -449,3 +449,246 @@
    }
    </script>
    ```
+## 热销商品占比
+效果图![销量趋势](https://github.com/lemon-0615/Echarts-vue/blob/main/%E6%95%88%E6%9E%9C%E5%9B%BE/%E5%95%86%E5%AE%B6%E5%88%86%E5%B8%83.png)
+### 图表基本功能的实现
+* 数据的获取
+   ```
+    asyncgetData(){
+     //获取服务器的数据,对this.allData进行赋值之后,调用updateChart方法更新图表
+      const{data:ret}=awaitthis.$http.get('hotproduct')
+      this.allData=ret
+      this.updateChart()
+      },
+   ```
+ * 数据的处理-增加currentIndex索引代表当前显示的数据索引, 后期通过左右箭头改变currentIndex的值
+  ```
+  updateChart(){
+   //处理图表需要的数据
+   //饼图数据
+    const seriesData=this.allData[this.currentIndex].children.map(item=>{
+     return{
+       value:item.value,
+       name:item.name
+      }
+     })
+       //图例数据
+     const legendData=this.allData[this.currentIndex].children.map(item=>{
+       returnitem.name
+       })
+       constdataOption={legend:{data:legendData},
+       series:[
+         {
+           data:seriesData
+           }
+         ]
+       }
+       this.chartInstance.setOption(dataOption)
+       },
+  ```
+ ### 切换数据的实现 
+ * 布局-在页面上增加箭头的图案，点击事件
+  ```
+  <!--热销商品图表-->
+  <template>
+  <div class='com-container'>
+     <div class='com-chart'ref='hot_ref'></div>
+     <span class="iconfontarr_left" @click="toLeft">&#xe6ef;</span>
+     <span class="iconfontarr_right" @click="toRight">&#xe6ed;</span>
+     methods:{ toLeft(){
+       this.currentIndex--
+       if(this.currentIndex<0){
+           this.currentIndex=this.allData.length-1
+           }
+         this.updateChart()
+         },
+       toRight(){
+          this.currentIndex++
+          if(this.currentIndex>this.allData.length-1){
+             this.currentIndex=0
+             }
+           this.updateChart()
+         }
+       }
+      </div>
+   </template>
+  ```
+ * 分类名称的显示，名称的改变通过增加计算属性catTitle
+ ```
+ <script>
+ export default{
+   ......
+  computed:{
+   catTitle() {
+   if(!this.allData) {
+     return''
+    }
+    return this.allData[this.currentIndex].name
+    }
+   },
+ <!--热销商品图表-->
+ <template>
+      <div class='com-container'>
+       ......
+       <span class="cat_name">{{catTitle}}</span>
+    </div>
+   </template>
+ ```
+ ### UI效果的调整
+ * 默认隐藏文字, 高亮显示文字
+  ```
+  methods: {
+    initChart () {
+    this.chartInstance = this.$echarts.init(this.$refs.hot_ref, 'chalk')
+    const initOption = {
+      ......
+      series: [
+      {
+         type: 'pie',
+         label: { // 隐藏文字
+         show: false
+      },
+         labelLine: { // 隐藏线
+         show: false
+      },
+      emphasis: {
+      label: { // 高亮显示文字
+         show: true
+          }
+       }
+     }
+    ]
+   }
+    this.chartInstance.setOption(initOption)
+   },
+   ```
+ ### 分辨率适配
+ * 分辨率适配主要就是在 screenAdapter 方法中进行, 需要获取图表容器的宽度,计算出标题字体大小,将字体的大小赋值给 titleFontSize
+ ```
+ <script>
+export default {
+   data () {
+    return {
+      titleFontSize: 0
+      }
+    },
+ ......
+ screenAdapter () {
+   this.titleFontSize = this.$refs.hot_ref.offsetWidth / 100 * 3.6
+ }
+```
+* 箭头大小和分类名称:定义计算属性 comStyle
+ ```
+ computed: {
+   ......
+   comStyle () {
+      return {
+        fontSize: this.titleFontSize + 'px'
+        }
+      }
+  },
+ ```
+ * 将 comStyle 通过 :style 的方式作用到箭头和分类上
+ ```
+ <template>
+  <div class='com-container'>
+    <div class='com-chart' ref='hot_ref'></div>
+     <span class="iconfont arr_left" @click="toLeft" :style="comStyle">&#xe6ef;</span>
+     <span class="iconfont arr_right" @click="toRight :style="comStyle">&#xe6ed;</span>
+     <span class="cat_name" :style="comStyle">{{ catTitle }}</span>
+   </div>
+ </template>
+ ```
+## 库存销量分析
+### 图表基本功能的实现
+* 数据的处理, 要显示5个圆环的实现
+ ```
+updateChart () {
+  // 处理图表需要的数据
+  // 5个圆环对应的圆心点
+ const centerPointers = [
+     ['18%', '40%'],
+     ['50%', '40%'],
+     ['82%', '40%'],
+     ['34%', '75%'],
+     ['66%', '75%']
+  ]
+ // 先显示前5条数据
+  const showData = this.allData.slice(0, 5)
+  const seriesArr = showData.map((item, index) => {
+return {
+  type: 'pie',
+  center: centerPointers[index],
+  radius: [110, 100],
+  data: [
+   {
+     value: item.sales
+   },
+   {
+    value: item.stock,
+   }
+  ]
+  }
+})
+const dataOption = {
+    series: seriesArr
+}
+   this.chartInstance.setOption(dataOption)
+},
+ ```
+### 切换动画
+* 增加数据 currentIndex ,标识当前的页数
+* 根据 currentIndex 决定展示的数据
+ ```
+ updateChart () {
+  ......
+  const start = this.currentIndex * 5
+  const end = (this.currentIndex + 1) * 5
+  const showData = this.allData.slice(start, end)
+  const seriesArr = showData.map((item, index) => {
+  ......
+ ```
+ * 数据获取成功之后启动动画
+  ```
+   async getData () {
+    // 获取服务器的数据, 对this.allData进行赋值之后, 调用updateChart方法更新图表
+    const { data: ret } = await this.$http.get('stock')
+    this.allData = ret
+    this.updateChart()
+    this.startInterval()
+  },
+  ......
+  startInterval () {
+    if (this.timerId) {
+      clearInterval(this.timerId)
+    }
+  this.timerId = setInterval(() => {
+   this.currentIndex++
+   if (this.currentIndex > 1) {
+     this.currentIndex = 0
+   }
+     this.updateChart()
+  }, 3000)
+ }
+ ```
+* 组件销毁时停止动画
+ ```
+ destroyed () {
+    window.removeEventListener('resize', this.screenAdapter)
+    clearInterval(this.timerId)
+ },
+
+ ```
+* 鼠标事件的处理
+```
+methods: {
+  initChart () {
+    ......
+    this.chartInstance.on('mouseover', () => {
+       clearInterval(this.timerId)
+   })
+  this.chartInstance.on('mouseout', () => {
+      this.startInterval()
+  })
+ },
+```
