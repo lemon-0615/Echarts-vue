@@ -692,3 +692,69 @@ methods: {
   })
  },
 ```
+## WebSocket的引入
+WebSocket 可以保持着浏览器和客户端之间的长连接， 通过 WebSocket 可以实现数据由后端推送到前端，保证了数据传输的实时性. WebSocket 涉及到前端代码和后端代码的改造
+###后端
+* 安装 WebSocket 包npm i ws -S
+* 创建 WebSocket 实例对象
+  ```
+   const WebSocket = require("ws")
+   // 创建出WebSocket实例对象
+   const wss = new WebSocket.Server({
+    port: 9998
+   })
+  ```
+* 监听事件
+ ```
+ wss.on("connection", client => {
+   console.log("有客户端连接...")
+   client.on("message", msg => {
+      console.log("客户端发送数据过来了")
+      // 发送数据给客户端
+      client.send('hello socket')
+    })
+ })
+ ```
+### 前端的测试代码
+  ```
+    <!DOCTYPE html>
+   <html lang="en">
+   <head>
+     <meta charset="UTF-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+     <title>Document</title>
+   </head>
+   <body>
+      <button id="connect">连接</button>
+      <button id="send" disabled="true">发送数据</button> <br>
+   从服务器接收的数据如下:<br>
+   <span id="content"></span>
+   <script>
+    var connect = document.querySelector('#connect')
+    var send = document.querySelector('#send')
+    var content = document.querySelector('#content')
+    var ws = null
+    connect.onclick = function() {
+     ws = new WebSocket('ws://localhost:9998')
+     ws.onopen = () => {
+      console.log('连接服务器成功')
+      send.disabled = false
+    }
+    ws.onmessage = msg => {
+      console.log('从服务器接收到了数据')
+      content.innerHTML = msg.data
+   }
+    ws.onclose = e => {
+      console.log('服务器关闭了连接')
+      send.disabled = true
+     }
+    }
+    send.onclick = function(){
+     ws.send('hello websocket from frontend')
+   }
+   </script>
+   </body>
+  </html>
+
+   ```
