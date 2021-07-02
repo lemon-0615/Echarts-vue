@@ -694,7 +694,7 @@ methods: {
 ```
 ## WebSocket的引入
 WebSocket 可以保持着浏览器和客户端之间的长连接， 通过 WebSocket 可以实现数据由后端推送到前端，保证了数据传输的实时性. WebSocket 涉及到前端代码和后端代码的改造
-###后端
+### 后端
 * 安装 WebSocket 包npm i ws -S
 * 创建 WebSocket 实例对象
   ```
@@ -758,3 +758,128 @@ WebSocket 可以保持着浏览器和客户端之间的长连接， 通过 WebSo
   </html>
 
    ```
+## 使用WebSocket改造项目
+### 后端工程
+1. 创建web_socket_service.js
+  * 创建Socket对象
+  * 监听事件-connection，message
+  * 将监听事件的代码放到一个函数中，并将这个函数导出
+2. 服务端接受数据字段约定
+  * action-代表某项行为，可选值有，getData代表获取图表数据，fullScreen代表产生了全屏事件，thmemChange代表产生了主题切换的事件
+  * socketType-代表业务模块类型，代表前端响应函数的标识，可选值有trendData,sellerData,mapData,rankData,hotData,stockData,fullScreen,themeChange
+  * chartName-代表图表名称，可选值有trend,seller,map,rank,hot,stock
+  * value
+4. 服务端发送数据字段约定
+   * 接受到action为getData时
+    + 取出数据中的chartName字段
+    + 拼接json文件的路径
+    + 读取该文件的内容
+    + 在接受到的数据基础之上，增加data字段，其值就是所读取的文件内容
+   * 接受到action不为getData时，原封不动的将从客户端接受到的数据，转发给每一个处于连接状态的客户端
+### 前端工程
+ 1. 创建socket_service.js
+   * 定义类SocketService,并定义成单例设计模式定义连接服务器的方法connect
+     + 单例模式-这种模式涉及到一个单一的类，该类负责创建自己的对象，同时确保只有单个对象被创建。这个类提供了一种访问其唯一的对象的方式，可以直接访问，不需要实例化该类的对象。
+     + 从get Instance中获取SocketService对象，都是同一个对象
+      ```
+        static instance = null
+        static get Instance() {
+        if (!this.instance) {
+          this.instance = new SocketService()
+        }
+         return this.instance
+         }
+      ```
+   * 定义连接服务器的方法connect
+     + 创建WebSocket对象，对服务器进行连接
+      ```
+       // 定义连接服务器的方法
+      connect() {
+        // 连接服务器
+       if (!window.WebSocket) return console.log('您的浏览器不支持 WebSocket');
+       // this.ws = new WebSocket('ws://localhost:9998')
+       // 使用接口地址
+       this.ws = new WebSocket('ws://120.53.120.229:9998')
+     ```
+     + 在main.js中调用此方法
+     ```
+      // 引入 socket_service
+      import SocketService from './utils/socket_service'
+      // 对服务端进行 webSocket的连接
+      SocketService.Instance.connect()
+      Vue.prototype.$socket = SocketService.Instance
+     ```
+   * 监听事件onopen,onmessage,onclose
+   * 存储回调函数,事先将图表模块的方法存储在socket_service.js模块当中，一旦从后端得到数据，调用之前的方法，就可以将数据传递给每一个图表组件
+     + callBackMapping={}  存储回调函数
+     + registerCallBack(socketType,callBack){}  回调函数注册
+     + unRegisterCallBack(socketType){}         回调函数取消
+   * 接收数据的处理 onmessage 调用之前存储的回调函数，传递数据
+   * 定义发送数据的方法
+     ```
+      send(data) {
+        this.ws.send(JSON.stringify(data))
+       }
+     ```
+   * 挂载SocketService对象到vue的原型对象上
+   
+ 2. 组件的改造
+   * create 注册回调函数，指明回调函数的唯一标识sockettype
+     ```
+       created() {
+         // 在组件创建完成之后，进行回调函数的注册
+         this.$socket.registerCallBack('trendData', this.getData)
+       },
+     ```
+   * destroyed 取消回调函数
+     ```
+      destroyed() {
+         window.removeEventListener('resize', this.screenAdapter)
+         // 销毁注册的事件
+         this.$socket.unRegisterCallBack('trendData')
+         },
+     ```
+   * 在原来获取数据的地方，改为发送数据,服务端发送了数据之后，就会调用注册的getData函数，把得到的数据以参数的形式传递给了getData函数，this.allData=ret
+       ```
+         // websocket 请求数据
+         this.$socket.send({
+           action: 'getData',
+           socketType: 'trendData',
+           chartName: 'trend',
+           value: '',
+        })
+        ```
+ 4. 优化
+  * 在WebSocket处于连接状态的时候不可以执行send方法，因为连接需要时间
+  * 解决方案，重发数据机制：添加实例属性标识符connected，默认值是false，onopen时设置为true，onclose时设置为false，判断是否连接成功
+  * 发送数据时判断connected。true就直接发送，false就延时发送，延时的时长随着尝试的机会而增加，实例属性sendRetryCount
+    ```
+      // 发送数据的方法
+     send(data) {
+       if (this.connected) {
+         this.sendRetryCount = 0
+         // 调用 webSocket 身上的send方法
+         // console.log('发送请求：',data);
+         this.ws.send(JSON.stringify(data))
+       } else {
+         // 请求数据尝试的次数,次数变多，等待时间也增长
+         this.sendRetryCount++
+
+         setTimeout(() => {
+           this.send(data)
+         }, this.sendRetryCount * 500);
+       }
+     }
+    ```
+ * 断开重连机制，onclose，延时尝试连接服务器，延时的时长随着尝试的机会而增加，实例属性connectRetryCount
+    ```
+     // 连接已关闭  当连接成功后:服务器关闭
+    this.ws.onclose = () => {
+      this.connectRetryCount++
+      this.connected = false
+      console.log('连接已关闭');
+      setTimeout(() => {
+        this.connect() //这时会重新创建WebSocket实例对象
+      }, this.connectRetryCount * 500);
+    }
+    ```
