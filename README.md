@@ -883,3 +883,37 @@ WebSocket 可以保持着浏览器和客户端之间的长连接， 通过 WebSo
       }, this.connectRetryCount * 500);
     }
     ```
+## 细节处理
+### 组件合并（先前已做过屏幕适配处理）
+1. 创建Home.vue,并配置路由规则
+    ```
+     const routes = [{
+       path: '/',
+       redirect: '/home'
+     },
+     {
+       path: '/home',
+       component: Home
+     },
+    ```
+2. 创建布局和样式
+3. 注册组件，并将组件置于合适的位置
+4. 调整原有组件样式
+  * global.less .com-container
+  * Hot.vue 图例大小
+  * Stock.vue 圆环的大小
+### 全屏切换
+* 布局和样式的调整
+* 全屏状态数据的定义
+* 全屏状态样式的定义
+* 全屏图标的处理
+* 点击事件的处理
+* 联动效果
+### 主题切换
+1. 数据的存储 VueX 
+ * state theme
+ * mutation changeTheme
+2. 点击切换按钮，修改VueX中的theme数据
+3. 各个组件监听theme的变化
+4. 特殊处理
+5. 联动效果
