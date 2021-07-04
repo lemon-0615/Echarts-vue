@@ -850,39 +850,40 @@ WebSocket 可以保持着浏览器和客户端之间的长连接， 通过 WebSo
         })
         ```
  4. 优化
-  * 在WebSocket处于连接状态的时候不可以执行send方法，因为连接需要时间
-  * 解决方案，重发数据机制：添加实例属性标识符connected，默认值是false，onopen时设置为true，onclose时设置为false，判断是否连接成功
-  * 发送数据时判断connected。true就直接发送，false就延时发送，延时的时长随着尝试的机会而增加，实例属性sendRetryCount
-    ```
-      // 发送数据的方法
-     send(data) {
-       if (this.connected) {
-         this.sendRetryCount = 0
-         // 调用 webSocket 身上的send方法
-         // console.log('发送请求：',data);
-         this.ws.send(JSON.stringify(data))
-       } else {
-         // 请求数据尝试的次数,次数变多，等待时间也增长
-         this.sendRetryCount++
+   * 在WebSocket处于连接状态的时候不可以执行send方法，因为连接需要时间
+   * 解决方案，重发数据机制：添加实例属性标识符connected，默认值是false，onopen时设置为true，onclose时设置为false，判断是否连接成功
+   * 发送数据时判断connected。true就直接发送，false就延时发送，延时的时长随着尝试的机会而增加，实例属性sendRetryCount
+        ```
+          // 发送数据的方法
+         send(data) {
+           if (this.connected) {
+             this.sendRetryCount = 0
+             // 调用 webSocket 身上的send方法
+             // console.log('发送请求：',data);
+             this.ws.send(JSON.stringify(data))
+           } else {
+             // 请求数据尝试的次数,次数变多，等待时间也增长
+             this.sendRetryCount++
 
-         setTimeout(() => {
-           this.send(data)
-         }, this.sendRetryCount * 500);
-       }
-     }
-    ```
- * 断开重连机制，onclose，延时尝试连接服务器，延时的时长随着尝试的机会而增加，实例属性connectRetryCount
-    ```
-     // 连接已关闭  当连接成功后:服务器关闭
-    this.ws.onclose = () => {
-      this.connectRetryCount++
-      this.connected = false
-      console.log('连接已关闭');
-      setTimeout(() => {
-        this.connect() //这时会重新创建WebSocket实例对象
-      }, this.connectRetryCount * 500);
-    }
-    ```
+             setTimeout(() => {
+               this.send(data)
+             }, this.sendRetryCount * 500);
+           }
+         }
+        ```
+  * 断开重连机制，onclose，延时尝试连接服务器，延时的时长随着尝试的机会而增加，实例属性connectRetryCount
+  * 如果初始化连接服务端不成功, 或者连接成功了, 后来服务器关闭了, 这两种情况都会触发 onclose 事件,我们需要在这个事件中,进行重连
+      ```
+       // 连接已关闭  当连接成功后:服务器关闭
+      this.ws.onclose = () => {
+        this.connectRetryCount++
+        this.connected = false
+        console.log('连接已关闭');
+        setTimeout(() => {
+          this.connect() //这时会重新创建WebSocket实例对象
+        }, this.connectRetryCount * 500);
+      }
+      ```
 ## 细节处理
 ### 组件合并（先前已做过屏幕适配处理）
 1. 创建Home.vue,并配置路由规则
@@ -897,23 +898,360 @@ WebSocket 可以保持着浏览器和客户端之间的长连接， 通过 WebSo
      },
     ```
 2. 创建布局和样式
+     * 给每一个图一个框进行存放合适的容器中
 3. 注册组件，并将组件置于合适的位置
+     * 组件的引入和注册
+     * 给图表每一个组件都增加上 ref 属性
+       ```
+          <div class="screen-body">
+           <section class="screen-left">
+           <div id="left-top">
+              <!-- 销量趋势图表 -->
+          <Trend ref="trend"></Trend>
+          </div>
+          <div id="left-bottom">
+            <!-- 商家销售金额图表 -->
+            <Seller ref="seller"></Seller>
+          </div>
+        </section>
+         <section class="screen-middle">
+        <div id="middle-top">
+         <!-- 商家分布图表 -->
+          <Map ref="map"></Map>
+         </div>
+          <div id="middle-bottom">
+          <!-- 地区销量排行图表 -->
+         <Rank ref="rank"></Rank>
+        </div>
+         </section>
+        <section class="screen-right">
+         <div id="right-top">
+          <!-- 热销商品占比图表 -->
+          <Hot ref="hot"></Hot>
+        </div>
+        <div id="right-bottom">
+        <!-- 库存销量分析图表 -->
+          <Stock ref="stock"></Stock>
+          </div>
+          </section>
+        </div>
+       ```
 4. 调整原有组件样式
   * global.less .com-container
   * Hot.vue 图例大小
   * Stock.vue 圆环的大小
 ### 全屏切换
-* 布局和样式的调整
-* 全屏状态数据的定义
-* 全屏状态样式的定义
-* 全屏图标的处理
-* 点击事件的处理
-* 联动效果
+1. 布局和样式的调整
+      ```
+       <div id="left-top">
+        <Trend ref="trend"></Trend>
+        <div class="resize">
+        <span class="iconfont icon-compress-alt"></span>
+        </div>
+        </div>
+       ```
+2. 修改各个容器样式, 增加 position 为相对布局relative;
+3. 全屏状态数据的定义
+     ```
+       export default {
+         data () {
+         return {
+         fullScreenStatus: {
+         trend: false,
+         seller: false,
+         map: false,
+         rank: false,
+         hot: false,
+         stock: false
+             }
+            }
+           }
+         }
+     ```
+4. 全屏状态样式的定义
+      ```
+       .fullscreen {
+         position: fixed!important;
+         top: 0 !important;
+         left: 0 !important;
+         width: 100% !important;
+         height: 100% !important;
+         margin: 0 !important;
+         z-index: 100;
+         }
+       ```
+5. 全屏图标的处理，class 值的处理
+      ```
+        <div id="left-top" :class="[fullScreenStatus.trend ? 'fullscreen' : '']">
+         <Trend ref="trend"></Trend>
+         <div class="resize">
+         <span
+         :class="['iconfont', fullScreenStatus.trend ? 'icon-compressalt' : 'icon-expand-alt']"
+         @click="changeSize('trend')">
+         </span>
+         </div>
+         </div>
+      ```
+6. 点击事件的处理
+    ```
+     export default {
+       methods: {
+         changeSize (chartName) {
+           // 先得到目标状态
+           const targetValue = !this.fullScreenStatus[chartName]
+           // 将所有的图表设置为非全屏
+           Object.keys(this.fullScreenStatus).forEach(item => {
+             this.fullScreenStatus[item] = false
+         })
+         // 将目标图表设置为目标状态
+         this.fullScreenStatus[chartName] = targetValue
+         this.$nextTick(() => {
+           this.$refs[chartName].screenAdapter()
+         })
+        }
+       }
+     ```
+7. 联动效果-全屏事件的数据发送
+   * 点击按钮发送数据
+     ```
+      export default {
+          methods: {
+          changeSize (chartName) {
+            // 先得到目标状态
+            const targetValue = !this.fullScreenStatus[chartName]
+            // 将所有的图表设置为非全屏
+            // Object.keys(this.fullScreenStatus).forEach(item => {
+            // this.fullScreenStatus[item] = false
+            // })
+            // 将目标图表设置为目标状态
+            // this.fullScreenStatus[chartName] = targetValue
+            // this.$nextTick(() => {
+            // this.$refs[chartName].screenAdapter()
+            // })
+            this.$socket.send({
+               action: 'fullScreen',
+               socketType: 'fullScreen',
+               chartName: chartName,
+               value: targetValue
+             })
+            }
+          }
+         }
+     ```
+ * created 时注册回调函数
+       ```
+        export default {
+         created () {
+            this.$socket.registerCallBack('fullScreen', this.recvData)
+          },
+        }
+      ```
+ * destroyed 时取消回调函数
+     ```
+      export default {
+        destroyed () {
+          this.$socket.unRegisterCallBack('fullScreen')
+         },
+       }
+     ```
+  * 得到数据的处理
+      ```
+       export default {
+          methods: {
+            recvData (data) {
+            // 将所有的图表设置为非全屏
+           Object.keys(this.fullScreenStatus).forEach(item => {
+              this.fullScreenStatus[item] = false
+          })
+          // 将目标图表设置为目标状态
+          this.fullScreenStatus[data.chartName] = data.value
+          // 更新所有图表
+          Object.keys(this.fullScreenStatus).forEach(item => {
+            this.$nextTick(() => {
+              this.$refs[item].screenAdapter()
+            })
+            })
+          }
+         }
+        }
+      ```
+  * socket_service.js 代码的修改
+     ```
+      if (recvData.action === 'getData') {
+         const realData = recvData.data // 得到该图表的数据
+         this.callBackMapping[socketType].call(this, JSON.parse(realData))
+      } else if (action === 'fullScreen') {
+         this.callBackMapping[socketType].call(this, recvData)
+       }
+     ```
 ### 主题切换
-1. 数据的存储 VueX 
- * state theme
- * mutation changeTheme
-2. 点击切换按钮，修改VueX中的theme数据
-3. 各个组件监听theme的变化
-4. 特殊处理
-5. 联动效果
+当前主题的数据, 会在多个组件中使用, 因此设置在 VueX 中是最合适的, 增加仓库数据 theme , 并增加一个 mutation 用来修改 theme
+  1. 数据的存储 VueX 
+      * state theme
+      * mutation changeTheme
+          ```
+            export default new Vuex.Store({
+              state: {
+                 theme: 'chalk'
+            },
+            mutations: {
+              changeTheme (state) {
+               if (state.theme === 'chalk') {
+                 state.theme = 'vintage'
+             } else {
+              state.theme = 'chalk'
+              }
+             }
+            },
+           actions: {
+            },
+           modules: {
+            }
+          })
+         ```
+  2. 点击切换按钮，修改VueX中的theme数据
+    * 点击事件的响应
+          ```
+           <div class="title-right">
+              <img src="/static/img/qiehuan_dark.png" class="qiehuan" @click="changeTheme">
+            <span class="datetime">2049-01-01 00:00:00</span>
+           </div>
+          ```
+    * 点击事件的处理
+         ```
+         export default {
+          methods: {
+            changeTheme () {
+             this.$store.commit('changeTheme')
+             }
+            }
+          }
+
+         ```
+  3. 各个组件监听theme的变化
+    * 映射 store 中的 theme 作为当前组件的计算属性
+          ```
+           <script>
+            import { mapState } from 'vuex'
+            export default {
+              computed: {
+                ...mapState(['theme'])
+             }
+            }
+          ```
+    * 监听 theme 的变化
+         ```
+          export default {
+           watch: {
+             theme () {
+               this.chartInstance.dispose()
+               this.initChart()
+               this.screenAdapter()
+               this.updateChart()
+           }
+           }
+           }
+
+         ```
+  4. 特殊处理-原生HTML主题样式适配
+     * 创建 utils/theme_utils.js 文件,定义两个主题下, 需要进行样式切换的样式数据, 并对外导出一个函数, 用于方便的通过主题名称得到对应主题的某些配置项
+           ```
+           const theme = {
+              chalk: {
+                 // 背景色
+                 backgroundColor: '#161522',
+                 // ScreenPage组件中标题的颜色
+                 titleColor: '#fff',
+                 // 页面左上角logo图标
+                 logoSrc: 'logo_dark.png',
+                 // 页面顶部头部边框图片
+                 headerBorderSrc: 'header_border_dark.png',
+                 // 页面右上角切换按钮的图标
+                 themeSrc: 'qiehuan_dark.png'
+              },
+              vintage: {
+                backgroundColor: '#eeeeee',
+                titleColor: '#000',
+                logoSrc: 'logo_light2.png',
+                headerBorderSrc: 'header_border_light.png',
+                themeSrc: 'qiehuan_light.png'
+               }
+              }
+              export function getThemeValue (arg) {
+                return theme[arg]
+              }
+            ```
+     * Home.vue的调整
+           + 映射 VueX 中的 theme 数据作为该组件的计算属性
+               ```
+                import { mapState } from 'vuex'
+                   export default {
+                     computed: {
+                     ...mapState(['theme'])
+                   }
+                ```
+           + 定义一些控制样式的计算属性
+              ```
+               import { mapState } from 'vuex'
+               import { getThemeValue } from '@/utils/theme_utils'
+               export default {
+                 computed: {
+                    ...mapState(['theme']),
+               borderSrc () {
+                  return '/static/img/' + getThemeValue(this.theme).headerBorderSrc
+                },
+               logoSrc () {
+                   return '/static/img/' + getThemeValue(this.theme).logoSrc
+               },
+               themeSrc () {
+                  return '/static/img/' + getThemeValue(this.theme).themeSrc
+               },
+               containerStyle () {
+                 return {
+                    backgroundColor: getThemeValue(this.theme).backgroundColor
+                    color: getThemeValue(this.theme).titleColor
+                     }
+                   }
+                  }
+                }
+              ```
+     * Trend.vue-修改计算属性 comStyle 和 marginStyle
+           ```
+             import { mapState } from 'vuex'
+             import { getThemeValue } from '@/utils/theme_utils'
+             export default {
+                 computed: {
+                    comStyle () {
+                  return {
+                    fontSize: this.titleFontSize + 'px',
+                    color: getThemeValue(this.theme).titleColor
+                 }
+             },
+             marginStyle () {
+                 return {
+                    marginLeft: this.titleFontSize + 'px',
+                    backgroundColor: getThemeValue(this.theme).backgroundColor,
+                   color: getThemeValue(this.theme).titleColor
+                  }
+                },
+                ...mapState(['theme'])
+               },
+             }
+           ```
+    * Hot.vue-修改计算属性 comStyle
+           ```
+           import { mapState } from 'vuex'
+           import { getThemeValue } from '@/utils/theme_utils'
+           export default {
+             computed: {
+                comStyle () {
+                  return {
+                     fontSize: this.titleFontSize + 'px',
+                     color: getThemeValue(this.theme).titleColor
+                 }
+               },
+                ...mapState(['theme'])
+                }
+             }
+           ```
+  5. 联动效果
