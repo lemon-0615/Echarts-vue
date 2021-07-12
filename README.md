@@ -1182,39 +1182,39 @@ WebSocket 可以保持着浏览器和客户端之间的长连接， 通过 WebSo
               }
             ```
      * Home.vue的调整
-           + 映射 VueX 中的 theme 数据作为该组件的计算属性
-               ```
-                import { mapState } from 'vuex'
+            + 映射 VueX 中的 theme 数据作为该组件的计算属性
+                 ```
+                  import { mapState } from 'vuex'
+                     export default {
+                       computed: {
+                       ...mapState(['theme'])
+                     }
+                  ```
+            + 定义一些控制样式的计算属性
+                 ```
+                   import { mapState } from 'vuex'
+                   import { getThemeValue } from '@/utils/theme_utils'
                    export default {
                      computed: {
-                     ...mapState(['theme'])
-                   }
-                ```
-           + 定义一些控制样式的计算属性
-              ```
-               import { mapState } from 'vuex'
-               import { getThemeValue } from '@/utils/theme_utils'
-               export default {
-                 computed: {
-                    ...mapState(['theme']),
-               borderSrc () {
-                  return '/static/img/' + getThemeValue(this.theme).headerBorderSrc
-                },
-               logoSrc () {
-                   return '/static/img/' + getThemeValue(this.theme).logoSrc
-               },
-               themeSrc () {
-                  return '/static/img/' + getThemeValue(this.theme).themeSrc
-               },
-               containerStyle () {
-                 return {
-                    backgroundColor: getThemeValue(this.theme).backgroundColor
-                    color: getThemeValue(this.theme).titleColor
-                     }
-                   }
-                  }
-                }
-              ```
+                        ...mapState(['theme']),
+                   borderSrc () {
+                      return '/static/img/' + getThemeValue(this.theme).headerBorderSrc
+                    },
+                   logoSrc () {
+                       return '/static/img/' + getThemeValue(this.theme).logoSrc
+                   },
+                   themeSrc () {
+                      return '/static/img/' + getThemeValue(this.theme).themeSrc
+                   },
+                   containerStyle () {
+                     return {
+                        backgroundColor: getThemeValue(this.theme).backgroundColor
+                        color: getThemeValue(this.theme).titleColor
+                         }
+                       }
+                      }
+                    }
+                 ```
      * Trend.vue-修改计算属性 comStyle 和 marginStyle
      
            ```
@@ -1239,8 +1239,8 @@ WebSocket 可以保持着浏览器和客户端之间的长连接， 通过 WebSo
                 },
               }
            ```
-    * Hot.vue-修改计算属性 comStyle
-             ```
+   * Hot.vue-修改计算属性 comStyle
+            ```
               import { mapState } from 'vuex'
               import { getThemeValue } from '@/utils/theme_utils'
               export default {
@@ -1254,5 +1254,5 @@ WebSocket 可以保持着浏览器和客户端之间的长连接， 通过 WebSo
                    ...mapState(['theme'])
                    }
                  }
-             ```
+            ```
   5. 联动效果
