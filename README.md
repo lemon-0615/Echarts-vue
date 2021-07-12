@@ -1155,103 +1155,103 @@ WebSocket 可以保持着浏览器和客户端之间的长连接， 通过 WebSo
   4. 特殊处理-原生HTML主题样式适配
      * 创建 utils/theme_utils.js 文件,定义两个主题下, 需要进行样式切换的样式数据, 并对外导出一个函数, 用于方便的通过主题名称得到对应主题的某些配置项
            ```
-           const theme = {
-              chalk: {
-                 // 背景色
-                 backgroundColor: '#161522',
-                 // ScreenPage组件中标题的颜色
-                 titleColor: '#fff',
-                 // 页面左上角logo图标
-                 logoSrc: 'logo_dark.png',
-                 // 页面顶部头部边框图片
-                 headerBorderSrc: 'header_border_dark.png',
-                 // 页面右上角切换按钮的图标
-                 themeSrc: 'qiehuan_dark.png'
-              },
-              vintage: {
-                backgroundColor: '#eeeeee',
-                titleColor: '#000',
-                logoSrc: 'logo_light2.png',
-                headerBorderSrc: 'header_border_light.png',
-                themeSrc: 'qiehuan_light.png'
-               }
-              }
-              export function getThemeValue (arg) {
-                return theme[arg]
-              }
+             const theme = {
+                chalk: {
+                   // 背景色
+                   backgroundColor: '#161522',
+                   // ScreenPage组件中标题的颜色
+                   titleColor: '#fff',
+                   // 页面左上角logo图标
+                   logoSrc: 'logo_dark.png',
+                   // 页面顶部头部边框图片
+                   headerBorderSrc: 'header_border_dark.png',
+                   // 页面右上角切换按钮的图标
+                   themeSrc: 'qiehuan_dark.png'
+                },
+                vintage: {
+                  backgroundColor: '#eeeeee',
+                  titleColor: '#000',
+                  logoSrc: 'logo_light2.png',
+                  headerBorderSrc: 'header_border_light.png',
+                  themeSrc: 'qiehuan_light.png'
+                 }
+                }
+                export function getThemeValue (arg) {
+                  return theme[arg]
+                }
             ```
      * Home.vue的调整
             + 映射 VueX 中的 theme 数据作为该组件的计算属性
                  ```
-                  import { mapState } from 'vuex'
-                     export default {
-                       computed: {
-                       ...mapState(['theme'])
-                     }
+                   import { mapState } from 'vuex'
+                      export default {
+                        computed: {
+                        ...mapState(['theme'])
+                      }
                   ```
             + 定义一些控制样式的计算属性
                  ```
-                   import { mapState } from 'vuex'
-                   import { getThemeValue } from '@/utils/theme_utils'
-                   export default {
-                     computed: {
-                        ...mapState(['theme']),
-                   borderSrc () {
-                      return '/static/img/' + getThemeValue(this.theme).headerBorderSrc
+                    import { mapState } from 'vuex'
+                    import { getThemeValue } from '@/utils/theme_utils'
+                    export default {
+                      computed: {
+                         ...mapState(['theme']),
+                    borderSrc () {
+                       return '/static/img/' + getThemeValue(this.theme).headerBorderSrc
+                     },
+                    logoSrc () {
+                        return '/static/img/' + getThemeValue(this.theme).logoSrc
                     },
-                   logoSrc () {
-                       return '/static/img/' + getThemeValue(this.theme).logoSrc
-                   },
-                   themeSrc () {
-                      return '/static/img/' + getThemeValue(this.theme).themeSrc
-                   },
-                   containerStyle () {
-                     return {
-                        backgroundColor: getThemeValue(this.theme).backgroundColor
-                        color: getThemeValue(this.theme).titleColor
-                         }
+                    themeSrc () {
+                       return '/static/img/' + getThemeValue(this.theme).themeSrc
+                    },
+                    containerStyle () {
+                      return {
+                         backgroundColor: getThemeValue(this.theme).backgroundColor
+                         color: getThemeValue(this.theme).titleColor
+                          }
+                        }
                        }
-                      }
-                    }
+                     }
                  ```
      * Trend.vue-修改计算属性 comStyle 和 marginStyle
      
            ```
-              import { mapState } from 'vuex'
-              import { getThemeValue } from '@/utils/theme_utils'
-              export default {
-                  computed: {
-                     comStyle () {
-                   return {
-                     fontSize: this.titleFontSize + 'px',
-                     color: getThemeValue(this.theme).titleColor
-                  }
-              },
-              marginStyle () {
-                  return {
-                     marginLeft: this.titleFontSize + 'px',
-                     backgroundColor: getThemeValue(this.theme).backgroundColor,
-                    color: getThemeValue(this.theme).titleColor
+               import { mapState } from 'vuex'
+               import { getThemeValue } from '@/utils/theme_utils'
+               export default {
+                   computed: {
+                      comStyle () {
+                    return {
+                      fontSize: this.titleFontSize + 'px',
+                      color: getThemeValue(this.theme).titleColor
                    }
+               },
+               marginStyle () {
+                   return {
+                      marginLeft: this.titleFontSize + 'px',
+                      backgroundColor: getThemeValue(this.theme).backgroundColor,
+                     color: getThemeValue(this.theme).titleColor
+                    }
+                  },
+                  ...mapState(['theme'])
                  },
-                 ...mapState(['theme'])
-                },
-              }
+               }
            ```
    * Hot.vue-修改计算属性 comStyle
            ```
-              import { mapState } from 'vuex'
-              import { getThemeValue } from '@/utils/theme_utils'
-              export default {
-                computed: {
-                   comStyle () {
-                     return {
-                        fontSize: this.titleFontSize + 'px',
-                        color: getThemeValue(this.theme).titleColor
+               import { mapState } from 'vuex'
+               import { getThemeValue } from '@/utils/theme_utils'
+               export default {
+                 computed: {
+                    comStyle () {
+                      return {
+                         fontSize: this.titleFontSize + 'px',
+                         color: getThemeValue(this.theme).titleColor
+                     }
+                   },
+                    ...mapState(['theme'])
                     }
-                  },
-                   ...mapState(['theme'])
-                   }
-                 }
+                  }
            ```
   5. 联动效果
