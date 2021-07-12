@@ -1153,7 +1153,7 @@ WebSocket 可以保持着浏览器和客户端之间的长连接， 通过 WebSo
            ```
   4. 特殊处理-原生HTML主题样式适配
      * 创建 utils/theme_utils.js 文件,定义两个主题下, 需要进行样式切换的样式数据, 并对外导出一个函数, 用于方便的通过主题名称得到对应主题的某些配置项
-           ```
+          ```
              const theme = {
                 chalk: {
                    // 背景色
@@ -1178,16 +1178,16 @@ WebSocket 可以保持着浏览器和客户端之间的长连接， 通过 WebSo
                 export function getThemeValue (arg) {
                   return theme[arg]
                 }
-            ```
+         ```
      * Home.vue的调整
            + 映射 VueX 中的 theme 数据作为该组件的计算属性
-                    ```
+                  ```
                       import { mapState } from 'vuex'
                          export default {
                            computed: {
                            ...mapState(['theme'])
                          }
-                     ```
+                   ```
            + 定义一些控制样式的计算属性
                     ```
                        import { mapState } from 'vuex'
@@ -1215,7 +1215,7 @@ WebSocket 可以保持着浏览器和客户端之间的长连接， 通过 WebSo
                     ```
      * Trend.vue-修改计算属性 comStyle 和 marginStyle
      
-           ```
+            ```
                import { mapState } from 'vuex'
                import { getThemeValue } from '@/utils/theme_utils'
                export default {
@@ -1238,7 +1238,7 @@ WebSocket 可以保持着浏览器和客户端之间的长连接， 通过 WebSo
                }
            ```
    * Hot.vue-修改计算属性 comStyle
-           ```
+         ```
                import { mapState } from 'vuex'
                import { getThemeValue } from '@/utils/theme_utils'
                export default {
@@ -1252,5 +1252,5 @@ WebSocket 可以保持着浏览器和客户端之间的长连接， 通过 WebSo
                     ...mapState(['theme'])
                     }
                   }
-           ```
+          ```
   5. 联动效果
