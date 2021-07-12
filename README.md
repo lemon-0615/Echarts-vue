@@ -1129,29 +1129,29 @@ WebSocket 可以保持着浏览器和客户端之间的长连接， 通过 WebSo
          ```
   3. 各个组件监听theme的变化
     * 映射 store 中的 theme 作为当前组件的计算属性
-           ```
-             <script>
-              import { mapState } from 'vuex'
-              export default {
-                computed: {
-                  ...mapState(['theme'])
+            ```
+              <script>
+               import { mapState } from 'vuex'
+               export default {
+                 computed: {
+                   ...mapState(['theme'])
+                }
                }
-              }
-           ```
+            ```
     * 监听 theme 的变化
-          ```
-            export default {
-             watch: {
-               theme () {
-                 this.chartInstance.dispose()
-                 this.initChart()
-                 this.screenAdapter()
-                 this.updateChart()
-             }
-             }
-             }
+            ```
+              export default {
+               watch: {
+                 theme () {
+                   this.chartInstance.dispose()
+                   this.initChart()
+                   this.screenAdapter()
+                   this.updateChart()
+               }
+               }
+               }
 
-          ```
+            ```
   4. 特殊处理-原生HTML主题样式适配
      * 创建 utils/theme_utils.js 文件,定义两个主题下, 需要进行样式切换的样式数据, 并对外导出一个函数, 用于方便的通过主题名称得到对应主题的某些配置项
            ```
@@ -1182,38 +1182,38 @@ WebSocket 可以保持着浏览器和客户端之间的长连接， 通过 WebSo
             ```
      * Home.vue的调整
             + 映射 VueX 中的 theme 数据作为该组件的计算属性
-                 ```
-                   import { mapState } from 'vuex'
-                      export default {
-                        computed: {
-                        ...mapState(['theme'])
-                      }
-                  ```
+                    ```
+                      import { mapState } from 'vuex'
+                         export default {
+                           computed: {
+                           ...mapState(['theme'])
+                         }
+                     ```
             + 定义一些控制样式的计算属性
-                 ```
-                    import { mapState } from 'vuex'
-                    import { getThemeValue } from '@/utils/theme_utils'
-                    export default {
-                      computed: {
-                         ...mapState(['theme']),
-                    borderSrc () {
-                       return '/static/img/' + getThemeValue(this.theme).headerBorderSrc
-                     },
-                    logoSrc () {
-                        return '/static/img/' + getThemeValue(this.theme).logoSrc
-                    },
-                    themeSrc () {
-                       return '/static/img/' + getThemeValue(this.theme).themeSrc
-                    },
-                    containerStyle () {
-                      return {
-                         backgroundColor: getThemeValue(this.theme).backgroundColor
-                         color: getThemeValue(this.theme).titleColor
+                    ```
+                       import { mapState } from 'vuex'
+                       import { getThemeValue } from '@/utils/theme_utils'
+                       export default {
+                         computed: {
+                            ...mapState(['theme']),
+                       borderSrc () {
+                          return '/static/img/' + getThemeValue(this.theme).headerBorderSrc
+                        },
+                       logoSrc () {
+                           return '/static/img/' + getThemeValue(this.theme).logoSrc
+                       },
+                       themeSrc () {
+                          return '/static/img/' + getThemeValue(this.theme).themeSrc
+                       },
+                       containerStyle () {
+                         return {
+                            backgroundColor: getThemeValue(this.theme).backgroundColor
+                            color: getThemeValue(this.theme).titleColor
+                             }
+                           }
                           }
                         }
-                       }
-                     }
-                 ```
+                    ```
      * Trend.vue-修改计算属性 comStyle 和 marginStyle
      
            ```
