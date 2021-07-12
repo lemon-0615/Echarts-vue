@@ -1109,24 +1109,24 @@ WebSocket 可以保持着浏览器和客户端之间的长连接， 通过 WebSo
              })
           ```
   2. 点击切换按钮，修改VueX中的theme数据
-    * 点击事件的响应
+     * 点击事件的响应
+            ```
+              <div class="title-right">
+                 <img src="/static/img/qiehuan_dark.png" class="qiehuan" @click="changeTheme">
+               <span class="datetime">2049-01-01 00:00:00</span>
+              </div>
+            ```
+     * 点击事件的处理
            ```
-             <div class="title-right">
-                <img src="/static/img/qiehuan_dark.png" class="qiehuan" @click="changeTheme">
-              <span class="datetime">2049-01-01 00:00:00</span>
-             </div>
-           ```
-    * 点击事件的处理
-          ```
-            export default {
-             methods: {
-               changeTheme () {
-                this.$store.commit('changeTheme')
+             export default {
+              methods: {
+                changeTheme () {
+                 this.$store.commit('changeTheme')
+                 }
                 }
-               }
-             }
+              }
 
-          ```
+           ```
   3. 各个组件监听theme的变化
     * 映射 store 中的 theme 作为当前组件的计算属性
             ```
@@ -1181,7 +1181,7 @@ WebSocket 可以保持着浏览器和客户端之间的长连接， 通过 WebSo
                 }
             ```
      * Home.vue的调整
-            + 映射 VueX 中的 theme 数据作为该组件的计算属性
+           + 映射 VueX 中的 theme 数据作为该组件的计算属性
                     ```
                       import { mapState } from 'vuex'
                          export default {
@@ -1189,7 +1189,7 @@ WebSocket 可以保持着浏览器和客户端之间的长连接， 通过 WebSo
                            ...mapState(['theme'])
                          }
                      ```
-            + 定义一些控制样式的计算属性
+           + 定义一些控制样式的计算属性
                     ```
                        import { mapState } from 'vuex'
                        import { getThemeValue } from '@/utils/theme_utils'
