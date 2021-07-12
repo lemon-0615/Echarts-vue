@@ -1088,45 +1088,45 @@ WebSocket 可以保持着浏览器和客户端之间的长连接， 通过 WebSo
   1. 数据的存储 VueX 
       * state theme
       * mutation changeTheme
-          ```
-              export default new Vuex.Store({
-                state: {
-                   theme: 'chalk'
-              },
-              mutations: {
-                changeTheme (state) {
-                 if (state.theme === 'chalk') {
-                   state.theme = 'vintage'
-               } else {
-                state.theme = 'chalk'
+           ```
+               export default new Vuex.Store({
+                 state: {
+                    theme: 'chalk'
+               },
+               mutations: {
+                 changeTheme (state) {
+                  if (state.theme === 'chalk') {
+                    state.theme = 'vintage'
+                } else {
+                 state.theme = 'chalk'
+                 }
                 }
+               },
+              actions: {
+               },
+              modules: {
                }
-              },
-             actions: {
-              },
-             modules: {
-              }
-            })
-         ```
+             })
+          ```
   2. 点击切换按钮，修改VueX中的theme数据
     * 点击事件的响应
-          ```
-            <div class="title-right">
-               <img src="/static/img/qiehuan_dark.png" class="qiehuan" @click="changeTheme">
-             <span class="datetime">2049-01-01 00:00:00</span>
-            </div>
-          ```
+           ```
+             <div class="title-right">
+                <img src="/static/img/qiehuan_dark.png" class="qiehuan" @click="changeTheme">
+              <span class="datetime">2049-01-01 00:00:00</span>
+             </div>
+           ```
     * 点击事件的处理
-         ```
-           export default {
-            methods: {
-              changeTheme () {
-               this.$store.commit('changeTheme')
+          ```
+            export default {
+             methods: {
+               changeTheme () {
+                this.$store.commit('changeTheme')
+                }
                }
-              }
-            }
+             }
 
-         ```
+          ```
   3. 各个组件监听theme的变化
     * 映射 store 中的 theme 作为当前组件的计算属性
             ```
@@ -1140,16 +1140,16 @@ WebSocket 可以保持着浏览器和客户端之间的长连接， 通过 WebSo
             ```
     * 监听 theme 的变化
             ```
-              export default {
-               watch: {
-                 theme () {
-                   this.chartInstance.dispose()
-                   this.initChart()
-                   this.screenAdapter()
-                   this.updateChart()
-               }
-               }
-               }
+               export default {
+                watch: {
+                  theme () {
+                    this.chartInstance.dispose()
+                    this.initChart()
+                    this.screenAdapter()
+                    this.updateChart()
+                   }
+                 }
+                }
 
             ```
   4. 特殊处理-原生HTML主题样式适配
