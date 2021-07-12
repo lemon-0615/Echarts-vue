@@ -131,160 +131,159 @@
   * 在mounted生命周期中初始化 echartsInstance 对象
   * 在mounted中获取服务器的数据
   * 将获取到的数据设置到图表上
- ```
-   <script>
-   export default {
-    data () {
-      return {
-       chartInstance: null, // echarts实例对象
-       allData: [] // 服务器获取的所有数据
-      }
-   },
-   mounted () {
-     // 由于初始化echarts实例对象需要使用到dom元素,因此必须要放到mounted中, 而不是created
-     this.initChart()
-     this.getData()
-   },
-   methods: {
-    initChart () {
-    this.chartInstance = this.$echarts.init(this.$refs.seller_ref) // 初始化echarts实例对象
-   },
-   async getData () {
-     const { data: res } = await this.$http.get('seller') // 获取数据
-     this.allData = res
-   // 对allData进行从大到小的排序
-    this.allData.sort((a, b) => {
-      return a.value - b.value
-    })
-     this.updateChart()
-   },
-   updateChart () {
-     // 处理数据并且更新界面图表
-    const sellerNames = this.allData.map((item) => {
-       return item.name
-   })
-   const sellerValues = this.allData.map((item) => {
-      return item.value
-   })
-   const option = {
-    xAxis: {
-      type: 'value'
-    },
-    yAxis: {
-      type: 'category',
-      data: sellerNames
-    },
-    series: [
-   {
-      type: 'bar',
-      data: sellerValues
-     }
-    ]
-   }
-     this.chartInstance.setOption(option)
-       }
-     }
-   }
-   </script>
- ```
+         ```
+           <script>
+           export default {
+            data () {
+              return {
+               chartInstance: null, // echarts实例对象
+               allData: [] // 服务器获取的所有数据
+              }
+           },
+           mounted () {
+             // 由于初始化echarts实例对象需要使用到dom元素,因此必须要放到mounted中, 而不是created
+             this.initChart()
+             this.getData()
+           },
+           methods: {
+            initChart () {
+            this.chartInstance = this.$echarts.init(this.$refs.seller_ref) // 初始化echarts实例对象
+           },
+           async getData () {
+             const { data: res } = await this.$http.get('seller') // 获取数据
+             this.allData = res
+           // 对allData进行从大到小的排序
+            this.allData.sort((a, b) => {
+              return a.value - b.value
+            })
+             this.updateChart()
+           },
+           updateChart () {
+             // 处理数据并且更新界面图表
+            const sellerNames = this.allData.map((item) => {
+               return item.name
+           })
+           const sellerValues = this.allData.map((item) => {
+              return item.value
+           })
+           const option = {
+            xAxis: {
+              type: 'value'
+            },
+            yAxis: {
+              type: 'category',
+              data: sellerNames
+            },
+            series: [
+           {
+              type: 'bar',
+              data: sellerValues
+             }
+            ]
+           }
+             this.chartInstance.setOption(option)
+               }
+             }
+           }
+           </script>
+         ```
  * 拆分配置项option
     * 初始化配置项(和数据无关）
     * 拥有数据之后的配置项
  * 分页动画的实现
    * 数据的处理, 每5个元素显示一页
    * 数据的处理
-   ```
-       this.totalPage = Math.ceil(this.allData.length / 5)
-       const start = (this.curretnPage - 1) * 5
-       const end = this.curretnPage * 5
-       const showData = this.allData.slice(start, end)
-   ```
+      ```
+          this.totalPage = Math.ceil(this.allData.length / 5)
+          const start = (this.curretnPage - 1) * 5
+          const end = this.curretnPage * 5
+          const showData = this.allData.slice(start, end)
+      ```
    * 动画的启动和停止：通过定时器标识，开启定时器刷新效果
    * 鼠标事件的处理 
-     ```
-      this.chartInstance.on('mouseover', () => {
-         this.timerId && clearInterval(this.timerId)
-       })
-      ```
+       ```
+         this.chartInstance.on('mouseover', () => {
+            this.timerId && clearInterval(this.timerId)
+          })
+        ```
  ### 分辨率适配
 * 对窗口大小变化的事件进行监听
-```
- mounted () {
-    this.initChart()
-    this.getData()
-    window.addEventListener('resize', this.screenAdapter)
-}
-```
+    ```
+      mounted () {
+         this.initChart()
+         this.getData()
+         window.addEventListener('resize', this.screenAdapter)
+     }
+    ```
 * 组件销毁时取消监听
-```
- destroyed () {
-   clearInterval(this.timerId)
-   // 在组件销毁的时候, 需要将监听器取消掉
-   window.removeEventListener('resize', this.screenAdapter)
- },
-```
+   ```
+    destroyed () {
+      clearInterval(this.timerId)
+      // 在组件销毁的时候, 需要将监听器取消掉
+      window.removeEventListener('resize', this.screenAdapter)
+    },
+   ```
 * 获取图表容器的宽度计算字体大小
-```
-  // 当浏览器的大小发生变化的时候, 会调用的方法, 来完成屏幕的适配
-  screenAdapter () {
-  // console.log(this.$refs.seller_ref.offsetWidth)
-  const titleFontSize = this.$refs.seller_ref.offsetWidth / 100 * 3.6
-```
+  ```
+    // 当浏览器的大小发生变化的时候, 会调用的方法, 来完成屏幕的适配
+    screenAdapter () {
+    // console.log(this.$refs.seller_ref.offsetWidth)
+    const titleFontSize = this.$refs.seller_ref.offsetWidth / 100 * 3.6
+  ```
  ## 销量趋势分析
 效果图![销量趋势](https://github.com/lemon-0615/Echarts-vue/blob/main/%E6%95%88%E6%9E%9C%E5%9B%BE/%E9%94%80%E9%87%8F%E8%B6%8B%E5%8A%BF%E5%9B%BE.png)
 ### 图表基本功能的实现
  * 数据的获取:通过函数getData发送ajax请求异步获取数据
-  ```
-    async getData () {
-      // 获取服务器的数据, 对this.allData进行赋值之后, 调用updateChart方法更新图表
-      const { data: ret } = await this.$http.get('trend')
-      this.allData = ret
-      this.updateChart()
-   }
-
-  ```
-* 数据的处理
-    ```
-    updateChart () {
-      // x轴的数据
-      const timeArrs = this.allData.common.month
-      // y轴的数据, 暂时先取出map这个节点的数据
-      // map代表地区销量趋势
-      // seller代表商家销量趋势
-      // commodity代表商品销量趋势
-      const valueArrs = this.allData.map.data
-      // 图表数据, 一个图表中显示5条折线图
-      const seriesArr = valueArrs.map((item, index) => {
-         return {
-            type: 'line', // 折线图
-            name: item.name,
-            data: item.data,
-         }
-      })
-      const dataOption = {
-        xAxis: {
-          data: timeArrs
-        },
-      legend: {
-         data: legendArr
-        },
-      series: seriesArr
-         }
-        this.chartInstance.setOption(dataOption)
-      }
-    ```
-* 初始化配置
    ```
-    const initOption = {
-     xAxis: {
-       type: 'category',
-       boundaryGap: false
-     },
-    yAxis: {
-       type: 'value'
-       }
+      async getData () {
+        // 获取服务器的数据, 对this.allData进行赋值之后, 调用updateChart方法更新图表
+        const { data: ret } = await this.$http.get('trend')
+        this.allData = ret
+        this.updateChart()
      }
    ```
+* 数据的处理
+     ```
+        updateChart () {
+          // x轴的数据
+          const timeArrs = this.allData.common.month
+          // y轴的数据, 暂时先取出map这个节点的数据
+          // map代表地区销量趋势
+          // seller代表商家销量趋势
+          // commodity代表商品销量趋势
+          const valueArrs = this.allData.map.data
+          // 图表数据, 一个图表中显示5条折线图
+          const seriesArr = valueArrs.map((item, index) => {
+             return {
+                type: 'line', // 折线图
+                name: item.name,
+                data: item.data,
+             }
+          })
+          const dataOption = {
+            xAxis: {
+              data: timeArrs
+            },
+          legend: {
+             data: legendArr
+            },
+          series: seriesArr
+             }
+            this.chartInstance.setOption(dataOption)
+          }
+     ```
+* 初始化配置
+     ```
+       const initOption = {
+        xAxis: {
+          type: 'category',
+          boundaryGap: false
+        },
+       yAxis: {
+          type: 'value'
+          }
+        }
+     ```
 * 堆叠图效果-要实现堆叠图的效果, series下的每个对象都需要配置上相同的stack属性
 ### UI 效果的调整
 * 主题的使用
@@ -293,469 +292,469 @@
 ### 根据标题切换图表
 * 布局的实现-增加类样式为 title 的容器
 * 数据动态渲染v-for遍历
- ```
- <!-- 销量趋势图表 -->
-<template>
- <div class='com-container'>
-  <div class="title">
-   <span>{{ title }}</span>
-   <span class="iconfont title-icon">&#xe6eb;</span>
-   <div class="select-con">
-      <div class="select-item" v-for="item in selectTypes" :key="item.key">
-        {{ item.text }}
-      </div>
-   </div>
-  </div>
-<div class='com-chart' ref='trend_ref'></div>
-</div>
-</template>
- ```
-* 使用计算属性 title 控制标题的内容和标题的可选择项（过度掉当前选中的类别）
     ```
-       <script>
-       export default {
-         data () {
-           return {
-              chartInstance: null,
-              allData: null,
-              dataType: 'map' // 这项数据代表目前选择的数据类型, 可选值有map seller
-         commodity
-       }
-      },
-      computed: {
-         selectTypes () {
-            if (!this.allData || ! this.allData.type) {
-              return []
-        } else {
-            return this.allData.type.filter(item => {
-              return item.key !== this.dataType
-           })
-          }
-        },
-      title () {
-        if (!this.allData) {
-          return ''
-      } else {
-        return this.allData[this.dataType].title
-         }
-        }
-       },
+       <!-- 销量趋势图表 -->
+      <template>
+       <div class='com-container'>
+        <div class="title">
+         <span>{{ title }}</span>
+         <span class="iconfont title-icon">&#xe6eb;</span>
+         <div class="select-con">
+            <div class="select-item" v-for="item in selectTypes" :key="item.key">
+              {{ item.text }}
+            </div>
+         </div>
+        </div>
+      <div class='com-chart' ref='trend_ref'></div>
+      </div>
+      </template>
+    ```
+* 使用计算属性 title 控制标题的内容和标题的可选择项（过度掉当前选中的类别）
      ```
+         <script>
+         export default {
+           data () {
+             return {
+                chartInstance: null,
+                allData: null,
+                dataType: 'map' // 这项数据代表目前选择的数据类型, 可选值有map seller
+           commodity
+         }
+        },
+        computed: {
+           selectTypes () {
+              if (!this.allData || ! this.allData.type) {
+                return []
+          } else {
+              return this.allData.type.filter(item => {
+                return item.key !== this.dataType
+             })
+            }
+          },
+        title () {
+          if (!this.allData) {
+            return ''
+        } else {
+          return this.allData[this.dataType].title
+           }
+          }
+         },
+      ```
 * 点击三角控制显示隐藏-增加一项变量控制可选容器的显示与隐藏，showChoice: false来控制可选面板的显示或者隐藏
 * 使用指令 v-if 和点击事件的监听
+     ```
+      <span class="iconfont title-icon" @click="showChoice =!showChoice">&#xe6eb;</span>
+      <div class="select-con" v-if="showChoice">
     ```
-     <span class="iconfont title-icon" @click="showChoice =!showChoice">&#xe6eb;</span>
-     <div class="select-con" v-if="showChoice">
-   ```
 * 点击可选条目的控制
-   ```
-     handleSelect (key) {
-       this.dataType = key
-       this.updateChart()
-       this.showChoice = false
-      }
-   ```
+    ```
+      handleSelect (key) {
+        this.dataType = key
+        this.updateChart()
+        this.showChoice = false
+       }
+    ```
 ## 商家地图分布
 效果图![销量趋势](https://github.com/lemon-0615/Echarts-vue/blob/main/%E6%95%88%E6%9E%9C%E5%9B%BE/%E5%95%86%E5%AE%B6%E5%88%86%E5%B8%83.png)
 ### 显示地图
 * 获取中国地图矢量数据
 * 注册地图数据到 全局echarts对象 中
 * 配置 geo
-```
- <script>
-  // 获取的是Vue环境之下的数据, 而不是我们后台的数据
-  import axios from 'axios'
-  export default {
-   ......
-   methods: {
-     async initChart () {
-        this.chartInstance = this.$echarts.init(this.$refs.map_ref)
-        const { data: mapData } = await axios.get('http://127.0.0.1:8999/static/map/china.json')
-        this.$echarts.registerMap('china', mapData)
-        const initOption = {
-        geo: {
-            type: 'map',
-            map: 'china'
-            }
-          }
-          this.chartInstance.setOption(initOption)
-        },
- ```
+     ```
+      <script>
+       // 获取的是Vue环境之下的数据, 而不是我们后台的数据
+       import axios from 'axios'
+       export default {
+        ......
+        methods: {
+          async initChart () {
+             this.chartInstance = this.$echarts.init(this.$refs.map_ref)
+             const { data: mapData } = await axios.get('http://127.0.0.1:8999/static/map/china.json')
+             this.$echarts.registerMap('china', mapData)
+             const initOption = {
+             geo: {
+                 type: 'map',
+                 map: 'china'
+                 }
+               }
+               this.chartInstance.setOption(initOption)
+             },
+      ```
 ### 显示散点图
  * 获取散点数据
- ```
-   async getScatterData () {
-     // 获取服务器的数据, 对this.allData进行赋值之后, 调用updateChart方法更新图表
-     const { data: ret} = await this.$http.get('map')
-     this.allData = ret
-     this.updateChart()
-  }
- ```
-* 处理数据并且更新图表
-```
- updateChart () {
-    // 处理图表需要的数据
-     // 图例数据
-   const legendData = this.allData.map(item => {
-       return item.name
-})
-    // 散点数据
-  const seriesArr = this.allData.map(item => {
-     return {
-         type: 'effectScatter',
-         coordinateSystem: 'geo',
-         name: item.name,
-         data: item.children
+     ```
+        async getScatterData () {
+          // 获取服务器的数据, 对this.allData进行赋值之后, 调用updateChart方法更新图表
+          const { data: ret} = await this.$http.get('map')
+          this.allData = ret
+          this.updateChart()
        }
+     ```
+* 处理数据并且更新图表
+    ```
+      updateChart () {
+         // 处理图表需要的数据
+          // 图例数据
+        const legendData = this.allData.map(item => {
+            return item.name
      })
- const dataOption = {
-    legend: {
-       data: legendData
-     },
-       series: seriesArr
-    }
-    this.chartInstance.setOption(dataOption)
- },
- ```
+         // 散点数据
+       const seriesArr = this.allData.map(item => {
+          return {
+              type: 'effectScatter',
+              coordinateSystem: 'geo',
+              name: item.name,
+              data: item.children
+            }
+          })
+      const dataOption = {
+         legend: {
+            data: legendData
+          },
+            series: seriesArr
+         }
+         this.chartInstance.setOption(dataOption)
+      },
+     ```
  ### 地图点击事件
  * 响应图表的点击事件, 并获取点击项相关的数据
  * 将资料中的 map_utils.js 复制到 src/utils/ 目录之下
  * 得到地图所点击项的拼音和地图矢量数据的路径
-  ```
-   <script>
-  // 获取的是Vue环境之下的数据, 而不是我们后台的数据
-  import axios from 'axios'
-  import { getProvinceMapInfo } from '@/utils/map_utils'
-  export default {
-   ......
-   methods: {
-     async initChart () {
-     ......
-     this.chartInstance.setOption(initOption)
-     this.chartInstance.on('click', async arg => {
-       // arg.name 就是所点击的省份名称, 是中文
-      const provinceInfo = getProvinceMapInfo(arg.name)
-      const { data: ret } = await axios.get('http://127.0.0.1:8999' +provinceInfo.path)
-      this.$echarts.registerMap(provinceInfo.key, ret)
-      this.chartInstance.setOption({
-       geo: {
-         map: provinceInfo.key
+    ```
+       <script>
+      // 获取的是Vue环境之下的数据, 而不是我们后台的数据
+      import axios from 'axios'
+      import { getProvinceMapInfo } from '@/utils/map_utils'
+      export default {
+       ......
+       methods: {
+         async initChart () {
+         ......
+         this.chartInstance.setOption(initOption)
+         this.chartInstance.on('click', async arg => {
+           // arg.name 就是所点击的省份名称, 是中文
+          const provinceInfo = getProvinceMapInfo(arg.name)
+          const { data: ret } = await axios.get('http://127.0.0.1:8999' +provinceInfo.path)
+          this.$echarts.registerMap(provinceInfo.key, ret)
+          this.chartInstance.setOption({
+           geo: {
+             map: provinceInfo.key
+           }
+         })
+        })
+        this.getScatterData()
+         }
        }
-     })
-    })
-    this.getScatterData()
-     }
-   }
-   }
-   </script>
-   ```
+       }
+       </script>
+     ```
 ## 热销商品占比
 效果图![销量趋势](https://github.com/lemon-0615/Echarts-vue/blob/main/%E6%95%88%E6%9E%9C%E5%9B%BE/%E5%95%86%E5%AE%B6%E5%88%86%E5%B8%83.png)
 ### 图表基本功能的实现
 * 数据的获取
-   ```
-    asyncgetData(){
-     //获取服务器的数据,对this.allData进行赋值之后,调用updateChart方法更新图表
-      const{data:ret}=awaitthis.$http.get('hotproduct')
-      this.allData=ret
-      this.updateChart()
-      },
-   ```
- * 数据的处理-增加currentIndex索引代表当前显示的数据索引, 后期通过左右箭头改变currentIndex的值
-  ```
-  updateChart(){
-   //处理图表需要的数据
-   //饼图数据
-    const seriesData=this.allData[this.currentIndex].children.map(item=>{
-     return{
-       value:item.value,
-       name:item.name
-      }
-     })
-       //图例数据
-     const legendData=this.allData[this.currentIndex].children.map(item=>{
-       returnitem.name
-       })
-       constdataOption={legend:{data:legendData},
-       series:[
-         {
-           data:seriesData
-           }
-         ]
-       }
-       this.chartInstance.setOption(dataOption)
-       },
-  ```
- ### 切换数据的实现 
- * 布局-在页面上增加箭头的图案，点击事件
-  ```
-  <!--热销商品图表-->
-  <template>
-  <div class='com-container'>
-     <div class='com-chart'ref='hot_ref'></div>
-     <span class="iconfontarr_left" @click="toLeft">&#xe6ef;</span>
-     <span class="iconfontarr_right" @click="toRight">&#xe6ed;</span>
-     methods:{ toLeft(){
-       this.currentIndex--
-       if(this.currentIndex<0){
-           this.currentIndex=this.allData.length-1
-           }
+     ```
+       asyncgetData(){
+        //获取服务器的数据,对this.allData进行赋值之后,调用updateChart方法更新图表
+         const{data:ret}=awaitthis.$http.get('hotproduct')
+         this.allData=ret
          this.updateChart()
          },
-       toRight(){
-          this.currentIndex++
-          if(this.currentIndex>this.allData.length-1){
-             this.currentIndex=0
+     ```
+ * 数据的处理-增加currentIndex索引代表当前显示的数据索引, 后期通过左右箭头改变currentIndex的值
+      ```
+        updateChart(){
+         //处理图表需要的数据
+         //饼图数据
+          const seriesData=this.allData[this.currentIndex].children.map(item=>{
+           return{
+             value:item.value,
+             name:item.name
+            }
+           })
+             //图例数据
+           const legendData=this.allData[this.currentIndex].children.map(item=>{
+             returnitem.name
+             })
+             constdataOption={legend:{data:legendData},
+             series:[
+               {
+                 data:seriesData
+                 }
+               ]
              }
-           this.updateChart()
-         }
-       }
-      </div>
-   </template>
-  ```
+             this.chartInstance.setOption(dataOption)
+             },
+      ```
+ ### 切换数据的实现 
+ * 布局-在页面上增加箭头的图案，点击事件
+      ```
+        <!--热销商品图表-->
+        <template>
+        <div class='com-container'>
+           <div class='com-chart'ref='hot_ref'></div>
+           <span class="iconfontarr_left" @click="toLeft">&#xe6ef;</span>
+           <span class="iconfontarr_right" @click="toRight">&#xe6ed;</span>
+           methods:{ toLeft(){
+             this.currentIndex--
+             if(this.currentIndex<0){
+                 this.currentIndex=this.allData.length-1
+                 }
+               this.updateChart()
+               },
+             toRight(){
+                this.currentIndex++
+                if(this.currentIndex>this.allData.length-1){
+                   this.currentIndex=0
+                   }
+                 this.updateChart()
+               }
+             }
+            </div>
+         </template>
+      ```
  * 分类名称的显示，名称的改变通过增加计算属性catTitle
- ```
- <script>
- export default{
-   ......
-  computed:{
-   catTitle() {
-   if(!this.allData) {
-     return''
-    }
-    return this.allData[this.currentIndex].name
-    }
-   },
- <!--热销商品图表-->
- <template>
-      <div class='com-container'>
-       ......
-       <span class="cat_name">{{catTitle}}</span>
-    </div>
-   </template>
- ```
+    ```
+      <script>
+      export default{
+        ......
+       computed:{
+        catTitle() {
+        if(!this.allData) {
+          return''
+         }
+         return this.allData[this.currentIndex].name
+         }
+        },
+      <!--热销商品图表-->
+      <template>
+           <div class='com-container'>
+            ......
+            <span class="cat_name">{{catTitle}}</span>
+         </div>
+        </template>
+    ```
  ### UI效果的调整
  * 默认隐藏文字, 高亮显示文字
-  ```
-  methods: {
-    initChart () {
-    this.chartInstance = this.$echarts.init(this.$refs.hot_ref, 'chalk')
-    const initOption = {
-      ......
-      series: [
-      {
-         type: 'pie',
-         label: { // 隐藏文字
-         show: false
-      },
-         labelLine: { // 隐藏线
-         show: false
-      },
-      emphasis: {
-      label: { // 高亮显示文字
-         show: true
+      ```
+         methods: {
+           initChart () {
+           this.chartInstance = this.$echarts.init(this.$refs.hot_ref, 'chalk')
+           const initOption = {
+             ......
+             series: [
+             {
+                type: 'pie',
+                label: { // 隐藏文字
+                show: false
+             },
+                labelLine: { // 隐藏线
+                show: false
+             },
+             emphasis: {
+             label: { // 高亮显示文字
+                show: true
+                 }
+              }
+            }
+           ]
           }
-       }
-     }
-    ]
-   }
-    this.chartInstance.setOption(initOption)
-   },
-   ```
+           this.chartInstance.setOption(initOption)
+          },
+       ```
  ### 分辨率适配
  * 分辨率适配主要就是在 screenAdapter 方法中进行, 需要获取图表容器的宽度,计算出标题字体大小,将字体的大小赋值给 titleFontSize
- ```
- <script>
-export default {
-   data () {
-    return {
-      titleFontSize: 0
-      }
-    },
- ......
- screenAdapter () {
-   this.titleFontSize = this.$refs.hot_ref.offsetWidth / 100 * 3.6
- }
-```
+     ```
+       <script>
+      export default {
+         data () {
+          return {
+            titleFontSize: 0
+            }
+          },
+       ......
+       screenAdapter () {
+         this.titleFontSize = this.$refs.hot_ref.offsetWidth / 100 * 3.6
+       }
+    ```
 * 箭头大小和分类名称:定义计算属性 comStyle
- ```
- computed: {
-   ......
-   comStyle () {
-      return {
-        fontSize: this.titleFontSize + 'px'
-        }
-      }
-  },
- ```
+     ```
+       computed: {
+         ......
+         comStyle () {
+            return {
+              fontSize: this.titleFontSize + 'px'
+              }
+            }
+        },
+     ```
  * 将 comStyle 通过 :style 的方式作用到箭头和分类上
- ```
- <template>
-  <div class='com-container'>
-    <div class='com-chart' ref='hot_ref'></div>
-     <span class="iconfont arr_left" @click="toLeft" :style="comStyle">&#xe6ef;</span>
-     <span class="iconfont arr_right" @click="toRight :style="comStyle">&#xe6ed;</span>
-     <span class="cat_name" :style="comStyle">{{ catTitle }}</span>
-   </div>
- </template>
- ```
+    ```
+      <template>
+       <div class='com-container'>
+         <div class='com-chart' ref='hot_ref'></div>
+          <span class="iconfont arr_left" @click="toLeft" :style="comStyle">&#xe6ef;</span>
+          <span class="iconfont arr_right" @click="toRight :style="comStyle">&#xe6ed;</span>
+          <span class="cat_name" :style="comStyle">{{ catTitle }}</span>
+        </div>
+      </template>
+    ```
 ## 库存销量分析
 ### 图表基本功能的实现
 * 数据的处理, 要显示5个圆环的实现
- ```
-updateChart () {
-  // 处理图表需要的数据
-  // 5个圆环对应的圆心点
- const centerPointers = [
-     ['18%', '40%'],
-     ['50%', '40%'],
-     ['82%', '40%'],
-     ['34%', '75%'],
-     ['66%', '75%']
-  ]
- // 先显示前5条数据
-  const showData = this.allData.slice(0, 5)
-  const seriesArr = showData.map((item, index) => {
-return {
-  type: 'pie',
-  center: centerPointers[index],
-  radius: [110, 100],
-  data: [
-   {
-     value: item.sales
-   },
-   {
-    value: item.stock,
-   }
-  ]
-  }
-})
-const dataOption = {
-    series: seriesArr
-}
-   this.chartInstance.setOption(dataOption)
-},
- ```
+     ```
+        updateChart () {
+          // 处理图表需要的数据
+          // 5个圆环对应的圆心点
+         const centerPointers = [
+             ['18%', '40%'],
+             ['50%', '40%'],
+             ['82%', '40%'],
+             ['34%', '75%'],
+             ['66%', '75%']
+          ]
+         // 先显示前5条数据
+          const showData = this.allData.slice(0, 5)
+          const seriesArr = showData.map((item, index) => {
+        return {
+          type: 'pie',
+          center: centerPointers[index],
+          radius: [110, 100],
+          data: [
+           {
+             value: item.sales
+           },
+           {
+            value: item.stock,
+           }
+          ]
+          }
+        })
+        const dataOption = {
+            series: seriesArr
+        }
+           this.chartInstance.setOption(dataOption)
+        },
+     ```
 ### 切换动画
 * 增加数据 currentIndex ,标识当前的页数
 * 根据 currentIndex 决定展示的数据
- ```
- updateChart () {
-  ......
-  const start = this.currentIndex * 5
-  const end = (this.currentIndex + 1) * 5
-  const showData = this.allData.slice(start, end)
-  const seriesArr = showData.map((item, index) => {
-  ......
- ```
+     ```
+       updateChart () {
+        ......
+        const start = this.currentIndex * 5
+        const end = (this.currentIndex + 1) * 5
+        const showData = this.allData.slice(start, end)
+        const seriesArr = showData.map((item, index) => {
+        ......
+     ```
  * 数据获取成功之后启动动画
-  ```
-   async getData () {
-    // 获取服务器的数据, 对this.allData进行赋值之后, 调用updateChart方法更新图表
-    const { data: ret } = await this.$http.get('stock')
-    this.allData = ret
-    this.updateChart()
-    this.startInterval()
-  },
-  ......
-  startInterval () {
-    if (this.timerId) {
-      clearInterval(this.timerId)
-    }
-  this.timerId = setInterval(() => {
-   this.currentIndex++
-   if (this.currentIndex > 1) {
-     this.currentIndex = 0
-   }
-     this.updateChart()
-  }, 3000)
- }
- ```
+      ```
+          async getData () {
+           // 获取服务器的数据, 对this.allData进行赋值之后, 调用updateChart方法更新图表
+           const { data: ret } = await this.$http.get('stock')
+           this.allData = ret
+           this.updateChart()
+           this.startInterval()
+         },
+         ......
+         startInterval () {
+           if (this.timerId) {
+             clearInterval(this.timerId)
+           }
+         this.timerId = setInterval(() => {
+          this.currentIndex++
+          if (this.currentIndex > 1) {
+            this.currentIndex = 0
+          }
+            this.updateChart()
+         }, 3000)
+        }
+     ```
 * 组件销毁时停止动画
- ```
- destroyed () {
-    window.removeEventListener('resize', this.screenAdapter)
-    clearInterval(this.timerId)
- },
+   ```
+     destroyed () {
+        window.removeEventListener('resize', this.screenAdapter)
+        clearInterval(this.timerId)
+     },
 
- ```
+   ```
 * 鼠标事件的处理
-```
-methods: {
-  initChart () {
-    ......
-    this.chartInstance.on('mouseover', () => {
-       clearInterval(this.timerId)
-   })
-  this.chartInstance.on('mouseout', () => {
-      this.startInterval()
-  })
- },
-```
+    ```
+      methods: {
+        initChart () {
+          ......
+          this.chartInstance.on('mouseover', () => {
+             clearInterval(this.timerId)
+         })
+        this.chartInstance.on('mouseout', () => {
+            this.startInterval()
+        })
+       },
+    ```
 ## WebSocket的引入
 WebSocket 可以保持着浏览器和客户端之间的长连接， 通过 WebSocket 可以实现数据由后端推送到前端，保证了数据传输的实时性. WebSocket 涉及到前端代码和后端代码的改造
 ### 后端
 * 安装 WebSocket 包npm i ws -S
 * 创建 WebSocket 实例对象
-  ```
-   const WebSocket = require("ws")
-   // 创建出WebSocket实例对象
-   const wss = new WebSocket.Server({
-    port: 9998
-   })
-  ```
+    ```
+      const WebSocket = require("ws")
+      // 创建出WebSocket实例对象
+      const wss = new WebSocket.Server({
+       port: 9998
+      })
+    ```
 * 监听事件
- ```
- wss.on("connection", client => {
-   console.log("有客户端连接...")
-   client.on("message", msg => {
-      console.log("客户端发送数据过来了")
-      // 发送数据给客户端
-      client.send('hello socket')
+   ```
+    wss.on("connection", client => {
+      console.log("有客户端连接...")
+      client.on("message", msg => {
+         console.log("客户端发送数据过来了")
+         // 发送数据给客户端
+         client.send('hello socket')
+       })
     })
- })
- ```
+   ```
 ### 前端的测试代码
   ```
-    <!DOCTYPE html>
-   <html lang="en">
-   <head>
-     <meta charset="UTF-8">
-     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-     <title>Document</title>
-   </head>
-   <body>
-      <button id="connect">连接</button>
-      <button id="send" disabled="true">发送数据</button> <br>
-   从服务器接收的数据如下:<br>
-   <span id="content"></span>
-   <script>
-    var connect = document.querySelector('#connect')
-    var send = document.querySelector('#send')
-    var content = document.querySelector('#content')
-    var ws = null
-    connect.onclick = function() {
-     ws = new WebSocket('ws://localhost:9998')
-     ws.onopen = () => {
-      console.log('连接服务器成功')
-      send.disabled = false
-    }
-    ws.onmessage = msg => {
-      console.log('从服务器接收到了数据')
-      content.innerHTML = msg.data
-   }
-    ws.onclose = e => {
-      console.log('服务器关闭了连接')
-      send.disabled = true
+     <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta http-equiv="X-UA-Compatible" content="ie=edge">
+      <title>Document</title>
+    </head>
+    <body>
+       <button id="connect">连接</button>
+       <button id="send" disabled="true">发送数据</button> <br>
+    从服务器接收的数据如下:<br>
+    <span id="content"></span>
+    <script>
+     var connect = document.querySelector('#connect')
+     var send = document.querySelector('#send')
+     var content = document.querySelector('#content')
+     var ws = null
+     connect.onclick = function() {
+      ws = new WebSocket('ws://localhost:9998')
+      ws.onopen = () => {
+       console.log('连接服务器成功')
+       send.disabled = false
      }
+     ws.onmessage = msg => {
+       console.log('从服务器接收到了数据')
+       content.innerHTML = msg.data
     }
-    send.onclick = function(){
-     ws.send('hello websocket from frontend')
-   }
-   </script>
-   </body>
-  </html>
+     ws.onclose = e => {
+       console.log('服务器关闭了连接')
+       send.disabled = true
+      }
+     }
+     send.onclick = function(){
+      ws.send('hello websocket from frontend')
+    }
+    </script>
+    </body>
+   </html>
 
    ```
 ## 使用WebSocket改造项目
@@ -781,34 +780,34 @@ WebSocket 可以保持着浏览器和客户端之间的长连接， 通过 WebSo
    * 定义类SocketService,并定义成单例设计模式定义连接服务器的方法connect
      + 单例模式-这种模式涉及到一个单一的类，该类负责创建自己的对象，同时确保只有单个对象被创建。这个类提供了一种访问其唯一的对象的方式，可以直接访问，不需要实例化该类的对象。
      + 从get Instance中获取SocketService对象，都是同一个对象
-      ```
-        static instance = null
-        static get Instance() {
-        if (!this.instance) {
-          this.instance = new SocketService()
-        }
-         return this.instance
+       ```
+         static instance = null
+         static get Instance() {
+         if (!this.instance) {
+           this.instance = new SocketService()
          }
-      ```
+          return this.instance
+          }
+       ```
    * 定义连接服务器的方法connect
      + 创建WebSocket对象，对服务器进行连接
+       ```
+        // 定义连接服务器的方法
+       connect() {
+         // 连接服务器
+        if (!window.WebSocket) return console.log('您的浏览器不支持 WebSocket');
+        // this.ws = new WebSocket('ws://localhost:9998')
+        // 使用接口地址
+        this.ws = new WebSocket('ws://120.53.120.229:9998')
       ```
-       // 定义连接服务器的方法
-      connect() {
-        // 连接服务器
-       if (!window.WebSocket) return console.log('您的浏览器不支持 WebSocket');
-       // this.ws = new WebSocket('ws://localhost:9998')
-       // 使用接口地址
-       this.ws = new WebSocket('ws://120.53.120.229:9998')
-     ```
      + 在main.js中调用此方法
-     ```
-      // 引入 socket_service
-      import SocketService from './utils/socket_service'
-      // 对服务端进行 webSocket的连接
-      SocketService.Instance.connect()
-      Vue.prototype.$socket = SocketService.Instance
-     ```
+      ```
+        // 引入 socket_service
+        import SocketService from './utils/socket_service'
+        // 对服务端进行 webSocket的连接
+        SocketService.Instance.connect()
+        Vue.prototype.$socket = SocketService.Instance
+      ```
    * 监听事件onopen,onmessage,onclose
    * 存储回调函数,事先将图表模块的方法存储在socket_service.js模块当中，一旦从后端得到数据，调用之前的方法，就可以将数据传递给每一个图表组件
      + callBackMapping={}  存储回调函数
@@ -817,85 +816,85 @@ WebSocket 可以保持着浏览器和客户端之间的长连接， 通过 WebSo
    * 接收数据的处理 onmessage 调用之前存储的回调函数，传递数据
    * 定义发送数据的方法
      ```
-      send(data) {
-        this.ws.send(JSON.stringify(data))
-       }
+       send(data) {
+         this.ws.send(JSON.stringify(data))
+        }
      ```
    * 挂载SocketService对象到vue的原型对象上
    
  2. 组件的改造
    * create 注册回调函数，指明回调函数的唯一标识sockettype
      ```
-       created() {
-         // 在组件创建完成之后，进行回调函数的注册
-         this.$socket.registerCallBack('trendData', this.getData)
-       },
+        created() {
+          // 在组件创建完成之后，进行回调函数的注册
+          this.$socket.registerCallBack('trendData', this.getData)
+        },
      ```
    * destroyed 取消回调函数
      ```
-      destroyed() {
-         window.removeEventListener('resize', this.screenAdapter)
-         // 销毁注册的事件
-         this.$socket.unRegisterCallBack('trendData')
-         },
+       destroyed() {
+          window.removeEventListener('resize', this.screenAdapter)
+          // 销毁注册的事件
+          this.$socket.unRegisterCallBack('trendData')
+          },
      ```
    * 在原来获取数据的地方，改为发送数据,服务端发送了数据之后，就会调用注册的getData函数，把得到的数据以参数的形式传递给了getData函数，this.allData=ret
        ```
-         // websocket 请求数据
-         this.$socket.send({
-           action: 'getData',
-           socketType: 'trendData',
-           chartName: 'trend',
-           value: '',
-        })
+          // websocket 请求数据
+          this.$socket.send({
+            action: 'getData',
+            socketType: 'trendData',
+            chartName: 'trend',
+            value: '',
+         })
         ```
  4. 优化
    * 在WebSocket处于连接状态的时候不可以执行send方法，因为连接需要时间
    * 解决方案，重发数据机制：添加实例属性标识符connected，默认值是false，onopen时设置为true，onclose时设置为false，判断是否连接成功
    * 发送数据时判断connected。true就直接发送，false就延时发送，延时的时长随着尝试的机会而增加，实例属性sendRetryCount
         ```
-          // 发送数据的方法
-         send(data) {
-           if (this.connected) {
-             this.sendRetryCount = 0
-             // 调用 webSocket 身上的send方法
-             // console.log('发送请求：',data);
-             this.ws.send(JSON.stringify(data))
-           } else {
-             // 请求数据尝试的次数,次数变多，等待时间也增长
-             this.sendRetryCount++
+           // 发送数据的方法
+          send(data) {
+            if (this.connected) {
+              this.sendRetryCount = 0
+              // 调用 webSocket 身上的send方法
+              // console.log('发送请求：',data);
+              this.ws.send(JSON.stringify(data))
+            } else {
+              // 请求数据尝试的次数,次数变多，等待时间也增长
+              this.sendRetryCount++
 
-             setTimeout(() => {
-               this.send(data)
-             }, this.sendRetryCount * 500);
-           }
-         }
+              setTimeout(() => {
+                this.send(data)
+              }, this.sendRetryCount * 500);
+            }
+          }
         ```
   * 断开重连机制，onclose，延时尝试连接服务器，延时的时长随着尝试的机会而增加，实例属性connectRetryCount
   * 如果初始化连接服务端不成功, 或者连接成功了, 后来服务器关闭了, 这两种情况都会触发 onclose 事件,我们需要在这个事件中,进行重连
       ```
-       // 连接已关闭  当连接成功后:服务器关闭
-      this.ws.onclose = () => {
-        this.connectRetryCount++
-        this.connected = false
-        console.log('连接已关闭');
-        setTimeout(() => {
-          this.connect() //这时会重新创建WebSocket实例对象
-        }, this.connectRetryCount * 500);
-      }
+        // 连接已关闭  当连接成功后:服务器关闭
+       this.ws.onclose = () => {
+         this.connectRetryCount++
+         this.connected = false
+         console.log('连接已关闭');
+         setTimeout(() => {
+           this.connect() //这时会重新创建WebSocket实例对象
+         }, this.connectRetryCount * 500);
+       }
       ```
 ## 细节处理
 ### 组件合并（先前已做过屏幕适配处理）
 1. 创建Home.vue,并配置路由规则
     ```
-     const routes = [{
-       path: '/',
-       redirect: '/home'
-     },
-     {
-       path: '/home',
-       component: Home
-     },
+      const routes = [{
+        path: '/',
+        redirect: '/home'
+      },
+      {
+        path: '/home',
+        component: Home
+      },
     ```
 2. 创建布局和样式
      * 给每一个图一个框进行存放合适的容器中
@@ -903,38 +902,38 @@ WebSocket 可以保持着浏览器和客户端之间的长连接， 通过 WebSo
      * 组件的引入和注册
      * 给图表每一个组件都增加上 ref 属性
        ```
-          <div class="screen-body">
-           <section class="screen-left">
-           <div id="left-top">
-              <!-- 销量趋势图表 -->
-          <Trend ref="trend"></Trend>
-          </div>
-          <div id="left-bottom">
-            <!-- 商家销售金额图表 -->
-            <Seller ref="seller"></Seller>
-          </div>
-        </section>
-         <section class="screen-middle">
-        <div id="middle-top">
-         <!-- 商家分布图表 -->
-          <Map ref="map"></Map>
-         </div>
-          <div id="middle-bottom">
-          <!-- 地区销量排行图表 -->
-         <Rank ref="rank"></Rank>
-        </div>
+           <div class="screen-body">
+            <section class="screen-left">
+            <div id="left-top">
+               <!-- 销量趋势图表 -->
+           <Trend ref="trend"></Trend>
+           </div>
+           <div id="left-bottom">
+             <!-- 商家销售金额图表 -->
+             <Seller ref="seller"></Seller>
+           </div>
          </section>
-        <section class="screen-right">
-         <div id="right-top">
-          <!-- 热销商品占比图表 -->
-          <Hot ref="hot"></Hot>
-        </div>
-        <div id="right-bottom">
-        <!-- 库存销量分析图表 -->
-          <Stock ref="stock"></Stock>
+          <section class="screen-middle">
+         <div id="middle-top">
+          <!-- 商家分布图表 -->
+           <Map ref="map"></Map>
           </div>
+           <div id="middle-bottom">
+           <!-- 地区销量排行图表 -->
+          <Rank ref="rank"></Rank>
+         </div>
           </section>
-        </div>
+         <section class="screen-right">
+          <div id="right-top">
+           <!-- 热销商品占比图表 -->
+           <Hot ref="hot"></Hot>
+         </div>
+         <div id="right-bottom">
+         <!-- 库存销量分析图表 -->
+           <Stock ref="stock"></Stock>
+           </div>
+           </section>
+         </div>
        ```
 4. 调整原有组件样式
   * global.less .com-container
@@ -943,42 +942,42 @@ WebSocket 可以保持着浏览器和客户端之间的长连接， 通过 WebSo
 ### 全屏切换
 1. 布局和样式的调整
       ```
-       <div id="left-top">
-        <Trend ref="trend"></Trend>
-        <div class="resize">
-        <span class="iconfont icon-compress-alt"></span>
-        </div>
-        </div>
+        <div id="left-top">
+         <Trend ref="trend"></Trend>
+         <div class="resize">
+         <span class="iconfont icon-compress-alt"></span>
+         </div>
+         </div>
        ```
 2. 修改各个容器样式, 增加 position 为相对布局relative;
 3. 全屏状态数据的定义
      ```
-       export default {
-         data () {
-         return {
-         fullScreenStatus: {
-         trend: false,
-         seller: false,
-         map: false,
-         rank: false,
-         hot: false,
-         stock: false
+        export default {
+          data () {
+          return {
+          fullScreenStatus: {
+          trend: false,
+          seller: false,
+          map: false,
+          rank: false,
+          hot: false,
+          stock: false
+              }
              }
             }
-           }
-         }
+          }
      ```
 4. 全屏状态样式的定义
       ```
-       .fullscreen {
-         position: fixed!important;
-         top: 0 !important;
-         left: 0 !important;
-         width: 100% !important;
-         height: 100% !important;
-         margin: 0 !important;
-         z-index: 100;
-         }
+        .fullscreen {
+          position: fixed!important;
+          top: 0 !important;
+          left: 0 !important;
+          width: 100% !important;
+          height: 100% !important;
+          margin: 0 !important;
+          z-index: 100;
+          }
        ```
 5. 全屏图标的处理，class 值的处理
       ```
@@ -994,165 +993,165 @@ WebSocket 可以保持着浏览器和客户端之间的长连接， 通过 WebSo
       ```
 6. 点击事件的处理
     ```
-     export default {
-       methods: {
-         changeSize (chartName) {
-           // 先得到目标状态
-           const targetValue = !this.fullScreenStatus[chartName]
-           // 将所有的图表设置为非全屏
-           Object.keys(this.fullScreenStatus).forEach(item => {
-             this.fullScreenStatus[item] = false
-         })
-         // 将目标图表设置为目标状态
-         this.fullScreenStatus[chartName] = targetValue
-         this.$nextTick(() => {
-           this.$refs[chartName].screenAdapter()
-         })
-        }
-       }
-     ```
-7. 联动效果-全屏事件的数据发送
-   * 点击按钮发送数据
-     ```
       export default {
-          methods: {
+        methods: {
           changeSize (chartName) {
             // 先得到目标状态
             const targetValue = !this.fullScreenStatus[chartName]
             // 将所有的图表设置为非全屏
-            // Object.keys(this.fullScreenStatus).forEach(item => {
-            // this.fullScreenStatus[item] = false
-            // })
-            // 将目标图表设置为目标状态
-            // this.fullScreenStatus[chartName] = targetValue
-            // this.$nextTick(() => {
-            // this.$refs[chartName].screenAdapter()
-            // })
-            this.$socket.send({
-               action: 'fullScreen',
-               socketType: 'fullScreen',
-               chartName: chartName,
-               value: targetValue
-             })
-            }
-          }
-         }
-     ```
- * created 时注册回调函数
-       ```
-        export default {
-         created () {
-            this.$socket.registerCallBack('fullScreen', this.recvData)
-          },
-        }
-      ```
- * destroyed 时取消回调函数
-     ```
-      export default {
-        destroyed () {
-          this.$socket.unRegisterCallBack('fullScreen')
-         },
-       }
-     ```
-  * 得到数据的处理
-      ```
-       export default {
-          methods: {
-            recvData (data) {
-            // 将所有的图表设置为非全屏
-           Object.keys(this.fullScreenStatus).forEach(item => {
+            Object.keys(this.fullScreenStatus).forEach(item => {
               this.fullScreenStatus[item] = false
           })
           // 将目标图表设置为目标状态
-          this.fullScreenStatus[data.chartName] = data.value
-          // 更新所有图表
-          Object.keys(this.fullScreenStatus).forEach(item => {
-            this.$nextTick(() => {
-              this.$refs[item].screenAdapter()
-            })
-            })
-          }
+          this.fullScreenStatus[chartName] = targetValue
+          this.$nextTick(() => {
+            this.$refs[chartName].screenAdapter()
+          })
          }
         }
+     ```
+7. 联动效果-全屏事件的数据发送
+   * 点击按钮发送数据
+     ```
+       export default {
+           methods: {
+           changeSize (chartName) {
+             // 先得到目标状态
+             const targetValue = !this.fullScreenStatus[chartName]
+             // 将所有的图表设置为非全屏
+             // Object.keys(this.fullScreenStatus).forEach(item => {
+             // this.fullScreenStatus[item] = false
+             // })
+             // 将目标图表设置为目标状态
+             // this.fullScreenStatus[chartName] = targetValue
+             // this.$nextTick(() => {
+             // this.$refs[chartName].screenAdapter()
+             // })
+             this.$socket.send({
+                action: 'fullScreen',
+                socketType: 'fullScreen',
+                chartName: chartName,
+                value: targetValue
+              })
+             }
+           }
+          }
+     ```
+ * created 时注册回调函数
+       ```
+         export default {
+          created () {
+             this.$socket.registerCallBack('fullScreen', this.recvData)
+           },
+         }
       ```
+ * destroyed 时取消回调函数
+      ```
+        export default {
+          destroyed () {
+            this.$socket.unRegisterCallBack('fullScreen')
+           },
+         }
+      ```
+  * 得到数据的处理
+       ```
+         export default {
+            methods: {
+              recvData (data) {
+              // 将所有的图表设置为非全屏
+             Object.keys(this.fullScreenStatus).forEach(item => {
+                this.fullScreenStatus[item] = false
+            })
+            // 将目标图表设置为目标状态
+            this.fullScreenStatus[data.chartName] = data.value
+            // 更新所有图表
+            Object.keys(this.fullScreenStatus).forEach(item => {
+              this.$nextTick(() => {
+                this.$refs[item].screenAdapter()
+              })
+              })
+            }
+           }
+          }
+       ```
   * socket_service.js 代码的修改
-     ```
-      if (recvData.action === 'getData') {
-         const realData = recvData.data // 得到该图表的数据
-         this.callBackMapping[socketType].call(this, JSON.parse(realData))
-      } else if (action === 'fullScreen') {
-         this.callBackMapping[socketType].call(this, recvData)
-       }
-     ```
+      ```
+        if (recvData.action === 'getData') {
+           const realData = recvData.data // 得到该图表的数据
+           this.callBackMapping[socketType].call(this, JSON.parse(realData))
+        } else if (action === 'fullScreen') {
+           this.callBackMapping[socketType].call(this, recvData)
+         }
+      ```
 ### 主题切换
 当前主题的数据, 会在多个组件中使用, 因此设置在 VueX 中是最合适的, 增加仓库数据 theme , 并增加一个 mutation 用来修改 theme
   1. 数据的存储 VueX 
       * state theme
       * mutation changeTheme
           ```
-            export default new Vuex.Store({
-              state: {
-                 theme: 'chalk'
-            },
-            mutations: {
-              changeTheme (state) {
-               if (state.theme === 'chalk') {
-                 state.theme = 'vintage'
-             } else {
-              state.theme = 'chalk'
+              export default new Vuex.Store({
+                state: {
+                   theme: 'chalk'
+              },
+              mutations: {
+                changeTheme (state) {
+                 if (state.theme === 'chalk') {
+                   state.theme = 'vintage'
+               } else {
+                state.theme = 'chalk'
+                }
+               }
+              },
+             actions: {
+              },
+             modules: {
               }
-             }
-            },
-           actions: {
-            },
-           modules: {
-            }
-          })
+            })
          ```
   2. 点击切换按钮，修改VueX中的theme数据
     * 点击事件的响应
           ```
-           <div class="title-right">
-              <img src="/static/img/qiehuan_dark.png" class="qiehuan" @click="changeTheme">
-            <span class="datetime">2049-01-01 00:00:00</span>
-           </div>
+            <div class="title-right">
+               <img src="/static/img/qiehuan_dark.png" class="qiehuan" @click="changeTheme">
+             <span class="datetime">2049-01-01 00:00:00</span>
+            </div>
           ```
     * 点击事件的处理
          ```
-         export default {
-          methods: {
-            changeTheme () {
-             this.$store.commit('changeTheme')
-             }
+           export default {
+            methods: {
+              changeTheme () {
+               this.$store.commit('changeTheme')
+               }
+              }
             }
-          }
 
          ```
   3. 各个组件监听theme的变化
     * 映射 store 中的 theme 作为当前组件的计算属性
-          ```
-           <script>
-            import { mapState } from 'vuex'
-            export default {
-              computed: {
-                ...mapState(['theme'])
-             }
-            }
-          ```
+           ```
+             <script>
+              import { mapState } from 'vuex'
+              export default {
+                computed: {
+                  ...mapState(['theme'])
+               }
+              }
+           ```
     * 监听 theme 的变化
-         ```
-          export default {
-           watch: {
-             theme () {
-               this.chartInstance.dispose()
-               this.initChart()
-               this.screenAdapter()
-               this.updateChart()
-           }
-           }
-           }
+          ```
+            export default {
+             watch: {
+               theme () {
+                 this.chartInstance.dispose()
+                 this.initChart()
+                 this.screenAdapter()
+                 this.updateChart()
+             }
+             }
+             }
 
-         ```
+          ```
   4. 特殊处理-原生HTML主题样式适配
      * 创建 utils/theme_utils.js 文件,定义两个主题下, 需要进行样式切换的样式数据, 并对外导出一个函数, 用于方便的通过主题名称得到对应主题的某些配置项
            ```
@@ -1240,7 +1239,7 @@ WebSocket 可以保持着浏览器和客户端之间的长连接， 通过 WebSo
               }
            ```
    * Hot.vue-修改计算属性 comStyle
-            ```
+           ```
               import { mapState } from 'vuex'
               import { getThemeValue } from '@/utils/theme_utils'
               export default {
@@ -1254,5 +1253,5 @@ WebSocket 可以保持着浏览器和客户端之间的长连接， 通过 WebSo
                    ...mapState(['theme'])
                    }
                  }
-            ```
+           ```
   5. 联动效果
