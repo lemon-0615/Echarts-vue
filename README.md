@@ -1117,7 +1117,7 @@ WebSocket 可以保持着浏览器和客户端之间的长连接， 通过 WebSo
               </div>
             ```
      * 点击事件的处理
-           ```
+        ```
              export default {
               methods: {
                 changeTheme () {
@@ -1125,8 +1125,7 @@ WebSocket 可以保持着浏览器和客户端之间的长连接， 通过 WebSo
                  }
                 }
               }
-
-           ```
+         ```
   3. 各个组件监听theme的变化
     * 映射 store 中的 theme 作为当前组件的计算属性
             ```
@@ -1139,7 +1138,7 @@ WebSocket 可以保持着浏览器和客户端之间的长连接， 通过 WebSo
                }
             ```
     * 监听 theme 的变化
-            ```
+           ```
                export default {
                 watch: {
                   theme () {
@@ -1151,7 +1150,7 @@ WebSocket 可以保持着浏览器和客户端之间的长连接， 通过 WebSo
                  }
                 }
 
-            ```
+           ```
   4. 特殊处理-原生HTML主题样式适配
      * 创建 utils/theme_utils.js 文件,定义两个主题下, 需要进行样式切换的样式数据, 并对外导出一个函数, 用于方便的通过主题名称得到对应主题的某些配置项
            ```
