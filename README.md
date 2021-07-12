@@ -57,7 +57,7 @@
              }
          mCharts.setOption(option)
          })
-
+     
      </script>
      ```
 * 常见效果:地图和散点图结合
@@ -70,7 +70,7 @@
          rippleEffect: {
          scale: 10
          }
-       ```
+        ```
 ### 雷达图
   1. ECharts最基本的代码结构
   2. 定义各个维度的最大值, 通过radar属性配置，易用性,功能,拍照,跑分,续航, 每个维度的最大值都是100
@@ -205,7 +205,7 @@
          this.chartInstance.on('mouseover', () => {
             this.timerId && clearInterval(this.timerId)
           })
-        ```
+       ```
  ### 分辨率适配
 * 对窗口大小变化的事件进行监听
     ```
@@ -339,7 +339,7 @@
            }
           }
          },
-      ```
+     ```
 * 点击三角控制显示隐藏-增加一项变量控制可选容器的显示与隐藏，showChoice: false来控制可选面板的显示或者隐藏
 * 使用指令 v-if 和点击事件的监听
      ```
@@ -379,7 +379,7 @@
                }
                this.chartInstance.setOption(initOption)
              },
-      ```
+     ```
 ### 显示散点图
  * 获取散点数据
      ```
@@ -415,7 +415,7 @@
          }
          this.chartInstance.setOption(dataOption)
       },
-     ```
+    ```
  ### 地图点击事件
  * 响应图表的点击事件, 并获取点击项相关的数据
  * 将资料中的 map_utils.js 复制到 src/utils/ 目录之下
@@ -447,7 +447,7 @@
        }
        }
        </script>
-     ```
+    ```
 ## 热销商品占比
 效果图![销量趋势](https://github.com/lemon-0615/Echarts-vue/blob/main/%E6%95%88%E6%9E%9C%E5%9B%BE/%E5%95%86%E5%AE%B6%E5%88%86%E5%B8%83.png)
 ### 图表基本功能的实现
@@ -560,7 +560,7 @@
           }
            this.chartInstance.setOption(initOption)
           },
-       ```
+      ```
  ### 分辨率适配
  * 分辨率适配主要就是在 screenAdapter 方法中进行, 需要获取图表容器的宽度,计算出标题字体大小,将字体的大小赋值给 titleFontSize
      ```
@@ -676,7 +676,7 @@
         window.removeEventListener('resize', this.screenAdapter)
         clearInterval(this.timerId)
      },
-
+   
    ```
 * 鼠标事件的处理
     ```
@@ -756,7 +756,7 @@ WebSocket 可以保持着浏览器和客户端之间的长连接， 通过 WebSo
     </body>
    </html>
 
-   ```
+  ```
 ## 使用WebSocket改造项目
 ### 后端工程
 1. 创建web_socket_service.js
@@ -807,6 +807,7 @@ WebSocket 可以保持着浏览器和客户端之间的长连接， 通过 WebSo
         // 对服务端进行 webSocket的连接
         SocketService.Instance.connect()
         Vue.prototype.$socket = SocketService.Instance
+     
       ```
    * 监听事件onopen,onmessage,onclose
    * 存储回调函数,事先将图表模块的方法存储在socket_service.js模块当中，一旦从后端得到数据，调用之前的方法，就可以将数据传递给每一个图表组件
@@ -821,7 +822,7 @@ WebSocket 可以保持着浏览器和客户端之间的长连接， 通过 WebSo
         }
      ```
    * 挂载SocketService对象到vue的原型对象上
-   
+
  2. 组件的改造
    * create 注册回调函数，指明回调函数的唯一标识sockettype
      ```
@@ -847,7 +848,7 @@ WebSocket 可以保持着浏览器和客户端之间的长连接， 通过 WebSo
             chartName: 'trend',
             value: '',
          })
-        ```
+       ```
  4. 优化
    * 在WebSocket处于连接状态的时候不可以执行send方法，因为连接需要时间
    * 解决方案，重发数据机制：添加实例属性标识符connected，默认值是false，onopen时设置为true，onclose时设置为false，判断是否连接成功
@@ -863,7 +864,7 @@ WebSocket 可以保持着浏览器和客户端之间的长连接， 通过 WebSo
             } else {
               // 请求数据尝试的次数,次数变多，等待时间也增长
               this.sendRetryCount++
-
+        
               setTimeout(() => {
                 this.send(data)
               }, this.sendRetryCount * 500);
@@ -948,7 +949,7 @@ WebSocket 可以保持着浏览器和客户端之间的长连接， 通过 WebSo
          <span class="iconfont icon-compress-alt"></span>
          </div>
          </div>
-       ```
+      ```
 2. 修改各个容器样式, 增加 position 为相对布局relative;
 3. 全屏状态数据的定义
      ```
@@ -978,7 +979,7 @@ WebSocket 可以保持着浏览器和客户端之间的长连接， 通过 WebSo
           margin: 0 !important;
           z-index: 100;
           }
-       ```
+      ```
 5. 全屏图标的处理，class 值的处理
       ```
         <div id="left-top" :class="[fullScreenStatus.trend ? 'fullscreen' : '']">
@@ -1009,7 +1010,7 @@ WebSocket 可以保持着浏览器和客户端之间的长连接， 通过 WebSo
           })
          }
         }
-     ```
+    ```
 7. 联动效果-全屏事件的数据发送
    * 点击按钮发送数据
      ```
@@ -1044,7 +1045,7 @@ WebSocket 可以保持着浏览器和客户端之间的长连接， 通过 WebSo
              this.$socket.registerCallBack('fullScreen', this.recvData)
            },
          }
-      ```
+       ```
  * destroyed 时取消回调函数
       ```
         export default {
@@ -1110,12 +1111,14 @@ WebSocket 可以保持着浏览器和客户端之间的长连接， 通过 WebSo
           ```
   2. 点击切换按钮，修改VueX中的theme数据
      * 点击事件的响应
-            ```
+        
+        ```html
               <div class="title-right">
                  <img src="/static/img/qiehuan_dark.png" class="qiehuan" @click="changeTheme">
                <span class="datetime">2049-01-01 00:00:00</span>
               </div>
-            ```
+        ```
+        
      * 点击事件的处理
         ```
              export default {
@@ -1125,32 +1128,34 @@ WebSocket 可以保持着浏览器和客户端之间的长连接， 通过 WebSo
                  }
                 }
               }
-         ```
+        ```
   3. 各个组件监听theme的变化
-    * 映射 store 中的 theme 作为当前组件的计算属性
-            ```
-              <script>
-               import { mapState } from 'vuex'
-               export default {
-                 computed: {
-                   ...mapState(['theme'])
-                }
-               }
-            ```
-    * 监听 theme 的变化
-           ```
-               export default {
-                watch: {
-                  theme () {
-                    this.chartInstance.dispose()
-                    this.initChart()
-                    this.screenAdapter()
-                    this.updateChart()
-                   }
-                 }
-                }
 
-           ```
+* 映射 store 中的 theme 作为当前组件的计算属性
+        ```
+          <script>
+           import { mapState } from 'vuex'
+           export default {
+             computed: {
+               ...mapState(['theme'])
+            }
+           }
+        ```
+* 监听 theme 的变化
+       ```
+           export default {
+            watch: {
+              theme () {
+                this.chartInstance.dispose()
+                this.initChart()
+                this.screenAdapter()
+                this.updateChart()
+               }
+             }
+            }
+   
+       ```
+
   4. 特殊处理-原生HTML主题样式适配
      * 创建 utils/theme_utils.js 文件,定义两个主题下, 需要进行样式切换的样式数据, 并对外导出一个函数, 用于方便的通过主题名称得到对应主题的某些配置项
           ```
@@ -1179,43 +1184,52 @@ WebSocket 可以保持着浏览器和客户端之间的长连接， 通过 WebSo
                   return theme[arg]
                 }
          ```
+         
      * Home.vue的调整
-           + 映射 VueX 中的 theme 数据作为该组件的计算属性
-                  ```
-                      import { mapState } from 'vuex'
-                         export default {
-                           computed: {
-                           ...mapState(['theme'])
-                         }
-                   ```
-           + 定义一些控制样式的计算属性
-                    ```
-                       import { mapState } from 'vuex'
-                       import { getThemeValue } from '@/utils/theme_utils'
-                       export default {
-                         computed: {
-                            ...mapState(['theme']),
-                       borderSrc () {
-                          return '/static/img/' + getThemeValue(this.theme).headerBorderSrc
-                        },
-                       logoSrc () {
-                           return '/static/img/' + getThemeValue(this.theme).logoSrc
-                       },
-                       themeSrc () {
-                          return '/static/img/' + getThemeValue(this.theme).themeSrc
-                       },
-                       containerStyle () {
-                         return {
-                            backgroundColor: getThemeValue(this.theme).backgroundColor
-                            color: getThemeValue(this.theme).titleColor
-                             }
-                           }
-                          }
-                        }
-                    ```
-     * Trend.vue-修改计算属性 comStyle 和 marginStyle
-     
+          + 映射 VueX 中的 theme 数据作为该组件的计算属性
+                
+
             ```
+            import { mapState } from 'vuex'
+              export default {
+                computed: {
+                   ...mapState(['theme'])
+                 }
+            ```
+
+            + 定义一些控制样式的计算属性
+                  
+
+            ```
+            import { mapState } from 'vuex'
+            import { getThemeValue } from '@/utils/theme_utils'
+            export default {
+            	computed: {
+                    ...mapState(['theme']),
+                     borderSrc () {
+                          return '/static/img/' + getThemeValue(this.theme).headerBorderSrc
+                          },
+                      logoSrc () {
+                           return '/static/img/' + getThemeValue(this.theme).logoSrc
+                          },
+                      themeSrc () {
+                           return '/static/img/' + getThemeValue(this.theme).themeSrc
+                       },
+                      containerStyle () {
+                           return {
+                              backgroundColor: getThemeValue(this.theme).backgroundColor
+                              color: getThemeValue(this.theme).titleColor
+                           }
+                        }
+                      }
+                    }
+            ```
+
+            
+
+     * Trend.vue-修改计算属性 comStyle 和 marginStyle
+
+            
                import { mapState } from 'vuex'
                import { getThemeValue } from '@/utils/theme_utils'
                export default {
@@ -1236,7 +1250,6 @@ WebSocket 可以保持着浏览器和客户端之间的长连接， 通过 WebSo
                   ...mapState(['theme'])
                  },
                }
-           ```
    * Hot.vue-修改计算属性 comStyle
          ```
                import { mapState } from 'vuex'
@@ -1252,5 +1265,5 @@ WebSocket 可以保持着浏览器和客户端之间的长连接， 通过 WebSo
                     ...mapState(['theme'])
                     }
                   }
-           ```
+         ```
   5. 联动效果
