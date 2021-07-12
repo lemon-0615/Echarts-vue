@@ -1216,42 +1216,43 @@ WebSocket 可以保持着浏览器和客户端之间的长连接， 通过 WebSo
                 }
               ```
      * Trend.vue-修改计算属性 comStyle 和 marginStyle
+     
            ```
-             import { mapState } from 'vuex'
-             import { getThemeValue } from '@/utils/theme_utils'
-             export default {
-                 computed: {
-                    comStyle () {
-                  return {
-                    fontSize: this.titleFontSize + 'px',
-                    color: getThemeValue(this.theme).titleColor
-                 }
-             },
-             marginStyle () {
-                 return {
-                    marginLeft: this.titleFontSize + 'px',
-                    backgroundColor: getThemeValue(this.theme).backgroundColor,
-                   color: getThemeValue(this.theme).titleColor
-                  }
-                },
-                ...mapState(['theme'])
-               },
-             }
-           ```
-    * Hot.vue-修改计算属性 comStyle
-           ```
-           import { mapState } from 'vuex'
-           import { getThemeValue } from '@/utils/theme_utils'
-           export default {
-             computed: {
-                comStyle () {
-                  return {
+              import { mapState } from 'vuex'
+              import { getThemeValue } from '@/utils/theme_utils'
+              export default {
+                  computed: {
+                     comStyle () {
+                   return {
                      fontSize: this.titleFontSize + 'px',
                      color: getThemeValue(this.theme).titleColor
-                 }
-               },
-                ...mapState(['theme'])
-                }
-             }
+                  }
+              },
+              marginStyle () {
+                  return {
+                     marginLeft: this.titleFontSize + 'px',
+                     backgroundColor: getThemeValue(this.theme).backgroundColor,
+                    color: getThemeValue(this.theme).titleColor
+                   }
+                 },
+                 ...mapState(['theme'])
+                },
+              }
            ```
+    * Hot.vue-修改计算属性 comStyle
+             ```
+              import { mapState } from 'vuex'
+              import { getThemeValue } from '@/utils/theme_utils'
+              export default {
+                computed: {
+                   comStyle () {
+                     return {
+                        fontSize: this.titleFontSize + 'px',
+                        color: getThemeValue(this.theme).titleColor
+                    }
+                  },
+                   ...mapState(['theme'])
+                   }
+                 }
+             ```
   5. 联动效果
