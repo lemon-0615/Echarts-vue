@@ -131,7 +131,7 @@
   * 在mounted生命周期中初始化 echartsInstance 对象
   * 在mounted中获取服务器的数据
   * 将获取到的数据设置到图表上
-         ```
+      ```
            <script>
            export default {
             data () {
@@ -186,7 +186,7 @@
              }
            }
            </script>
-         ```
+      ```     
  * 拆分配置项option
     * 初始化配置项(和数据无关）
     * 拥有数据之后的配置项
