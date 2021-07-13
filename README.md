@@ -449,7 +449,7 @@
        </script>
     ```
 ## 热销商品占比
-效果图![销量趋势](https://github.com/lemon-0615/Echarts-vue/blob/main/%E6%95%88%E6%9E%9C%E5%9B%BE/%E5%95%86%E5%AE%B6%E5%88%86%E5%B8%83.png)
+效果图![销量趋势](https://github.com/lemon-0615/Echarts-vue/blob/main/%E6%95%88%E6%9E%9C%E5%9B%BE/%E7%83%AD%E9%94%80%E5%95%86%E5%93%81%E5%8D%A0%E6%AF%94.png)
 ### 图表基本功能的实现
 * 数据的获取
      ```
@@ -599,6 +599,7 @@
       </template>
     ```
 ## 库存销量分析
+效果图![库存销量](https://github.com/lemon-0615/Echarts-vue/blob/main/%E6%95%88%E6%9E%9C%E5%9B%BE/%E5%BA%93%E5%AD%98%E5%92%8C%E9%94%80%E9%87%8F%E5%88%86%E6%9E%90.png)
 ### 图表基本功能的实现
 * 数据的处理, 要显示5个圆环的实现
      ```
